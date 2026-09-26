@@ -1,0 +1,18 @@
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+
+# local media storage (dev)
+/storage
+
+.env
+.env*.local
+!.env.example
+
+npm-debug.log*
+.DS_Store
+audit/
+dev.log
+prod.log

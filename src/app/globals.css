@@ -1,0 +1,232 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Colours, fonts and radius are runtime CSS variables written by the server
+ * from the admin theme (src/lib/theme/css.ts). Tailwind utilities point at
+ * them, so a theme change needs no rebuild.
+ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+
+  --font-sans: var(--ff-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--ff-display), var(--ff-body), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: var(--radius);
+  --radius-card-sm: calc(var(--radius) * 0.6);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fallback palette until the server theme is injected (and for tests). */
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --fg: #141414;
+  --muted: #62615d;
+  --border: #e4e2dc;
+  --accent: #5b4cf0;
+  --accent-fg: #ffffff;
+  --radius: 20px;
+  --ff-body: var(--font-manrope);
+  --ff-display: var(--font-manrope);
+  --header-h: 72px;
+}
+
+@layer base {
+  html {
+    /* Reserve scrollbar space so pages never jump sideways. */
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* Smooth colour cross-fade, enabled only while the theme toggle runs. */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 400ms ease,
+    border-color 400ms ease,
+    color 400ms ease,
+    fill 400ms ease !important;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Partner marquee — pure CSS so it never costs main-thread time. */
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+  animation-direction: var(--marquee-direction, normal);
+}
+.marquee[data-pause="true"]:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+
+/* Hero entrance — CSS only, so it plays before (and without) JavaScript. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.55em, 0);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.animate-rise {
+  animation: rise 1.1s var(--ease-out-expo) both;
+}
+
+@keyframes pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+/*
+ * Melts the hero portrait into the gradient behind it, so an ordinary
+ * rectangular photo reads as a cut-out. Stacked on mobile the photo is fully
+ * visible, so it fades top and bottom; beside the text it fades on the left.
+ * (A plain class, not an arbitrary utility, to keep the -webkit- prefix for
+ * Safari below 16.4.)
+ */
+.hero-photo-blend {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 17%, #000 88%, transparent),
+    linear-gradient(to right, transparent, #000 21%, #000 79%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 17%, #000 88%, transparent),
+    linear-gradient(to right, transparent, #000 21%, #000 79%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+@media (min-width: 1024px) {
+  /* Left and top together, so a rectangular photo has no hard upper edge. */
+  .hero-photo-blend {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 20%), linear-gradient(to bottom, transparent, #000 24%);
+    mask-image: linear-gradient(to right, transparent, #000 20%), linear-gradient(to bottom, transparent, #000 24%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .animate-rise,
+  .animate-pulse-ring {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Long-form text produced by the "text" block. */
+.prose-body {
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  line-height: 1.75;
+  color: color-mix(in oklab, var(--fg) 86%, var(--muted));
+}
+.prose-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-body strong {
+  color: var(--fg);
+  font-weight: 700;
+}
+.prose-body p + p {
+  margin-top: 1.1em;
+}
+
+/* Fixed dark palette for the admin panel — independent of the site theme,
+   so an unfortunate colour choice can never lock the admin out of fixing it. */
+.admin-root {
+  --bg: #0b0c0f;
+  --surface: #15161b;
+  --fg: #eeeef0;
+  --muted: #8d8f99;
+  --border: #25262d;
+  --accent: #9d8cff;
+  --accent-fg: #0b0c0f;
+  --radius: 14px;
+  --ff-body: var(--font-manrope);
+  --ff-display: var(--font-manrope);
+  color-scheme: dark;
+}
