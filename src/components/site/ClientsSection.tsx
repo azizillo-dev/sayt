@@ -18,6 +18,8 @@ interface Props {
   gradient: SiteSettings["hero"]["gradient"];
 }
 
+/** Five to a row on larger screens, three on a phone; a short row is centred. */
+const WIDTH = "w-[calc((100%-1.5rem)/3)] sm:w-[calc((100%-4rem)/5)]";
 const TILE = "flex aspect-[5/4] items-center justify-center rounded-2xl bg-[#363b88] p-3 shadow-[0_14px_30px_-18px_rgba(0,0,0,.6)] sm:p-4";
 
 /** "50+ projects" with the companies behind them — trust, right after the hero. */
@@ -44,21 +46,22 @@ export function ClientsSection({ count, title, text, partners, more, background,
           </div>
         </div>
 
-        <ul className="mt-4 grid grid-cols-3 gap-3 sm:mt-5 sm:grid-cols-5 sm:gap-4">
+        <ul className="mt-4 flex flex-wrap justify-center gap-3 sm:mt-5 sm:gap-4">
           {partners.map((partner) => (
-            <li key={partner.id} className={TILE} title={partner.name}>
+            <li key={partner.id} className={`${WIDTH} ${TILE}`} title={partner.name}>
               {partner.logo ? (
-                <Picture asset={partner.logo} alt={partner.name} sizes="160px" bare className="h-full w-full" imgClassName="h-full w-full object-contain" />
+                <Picture asset={partner.logo} alt={partner.name} sizes="160px" bare className="h-full w-full" // Every logo in white: brand colours (often black) vanish on the indigo tile.
+                  imgClassName="h-full w-full object-contain brightness-0 invert" />
               ) : (
                 <span className="text-center font-display text-base font-bold text-white sm:text-lg">{partner.name}</span>
               )}
             </li>
           ))}
           {more && (
-            <li>
+            <li className={WIDTH}>
               <Link
                 href={more.href}
-                className={`${TILE} text-center font-display text-sm font-bold text-white transition-[background-color,transform] duration-300 hover:-translate-y-1 hover:bg-[#4249a3] sm:text-xl`}
+                className={`${TILE} w-full text-center font-display text-sm font-bold text-white transition-[background-color,transform] duration-300 hover:-translate-y-1 hover:bg-[#4249a3] sm:text-xl`}
               >
                 {more.label}
               </Link>
