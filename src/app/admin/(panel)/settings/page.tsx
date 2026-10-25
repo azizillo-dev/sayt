@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Sozlamalar" };
 export default async function SettingsPage() {
   const { brand, hero, projects, contact, seo } = await getSettings();
   const smtpConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD);
-  const media = await getMediaMap([hero.photoId]);
+  const media = await getMediaMap([hero.photoId, hero.backgroundId]);
 
   return (
     <>
@@ -18,6 +18,7 @@ export default async function SettingsPage() {
       <GeneralSettingsForm
         initial={{ brand, hero, projects, contact, seo }}
         heroPhoto={hero.photoId ? (media[hero.photoId] ?? null) : null}
+        heroBackground={hero.backgroundId ? (media[hero.backgroundId] ?? null) : null}
         smtpConfigured={smtpConfigured}
       />
       <div className="mt-10">

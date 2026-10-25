@@ -18,6 +18,8 @@ interface Props {
   onChange: (patch: Partial<Hero>) => void;
   photo: MediaAsset | null;
   onPhoto: (asset: MediaAsset | null) => void;
+  background: MediaAsset | null;
+  onBackground: (asset: MediaAsset | null) => void;
 }
 
 const emptyColumn: HeroColumn = {
@@ -47,13 +49,17 @@ const colorLabels = {
  * A scaled-down copy of the real hero: same background, same photo placement,
  * so colours and a new photo can be judged without leaving the page.
  */
-function HeroPreview({ value, photo }: { value: Hero; photo: MediaAsset | null }) {
+function HeroPreview({ value, photo, background }: { value: Hero; photo: MediaAsset | null; background: MediaAsset | null }) {
   const columns = value.columns.filter((c) => c.title.uz.trim() || c.items.uz.trim());
 
   return (
     <div
       className="relative flex h-40 flex-col justify-between overflow-hidden rounded-xl border border-border p-4 sm:h-48"
-      style={{ background: heroBackground(value.gradient) }}
+      style={
+        background
+          ? { backgroundImage: `url(${background.url})`, backgroundSize: "cover", backgroundPosition: "center" }
+          : { background: heroBackground(value.gradient) }
+      }
     >
       {photo && (
         <img
@@ -62,7 +68,7 @@ function HeroPreview({ value, photo }: { value: Hero; photo: MediaAsset | null }
           style={{ aspectRatio: `${photo.width}/${photo.height}` }}
           className={cn(
             "absolute bottom-0 right-0 h-[92%] w-auto object-contain",
-            value.photoBlend && "hero-photo-blend",
+            value.photoBlend ? "hero-photo-blend" : "hero-photo-cutout",
           )}
         />
       )}
@@ -133,7 +139,7 @@ function ColumnsEditor({ columns, onChange }: { columns: HeroColumn[]; onChange:
   );
 }
 
-export function HeroSettings({ value, onChange, photo, onPhoto }: Props) {
+export function HeroSettings({ value, onChange, photo, onPhoto, background, onBackground }: Props) {
   const profile = value.layout === "profile";
 
   return (
@@ -148,7 +154,7 @@ export function HeroSettings({ value, onChange, photo, onPhoto }: Props) {
 
         {profile ? (
           <>
-            <HeroPreview value={value} photo={photo} />
+            <HeroPreview value={value} photo={photo} background={background} />
 
             <div className="grid gap-5 sm:grid-cols-[13rem_1fr] sm:items-start">
               <Group label="Rasm" hint="Foni olib tashlangan PNG eng chiroyli chiqadi">
@@ -170,10 +176,14 @@ export function HeroSettings({ value, onChange, photo, onPhoto }: Props) {
               checked={value.photoBlend}
               onChange={(photoBlend) => onChange({ photoBlend })}
               label="Rasm chetlarini fonga singdirish"
-              description="To'rtburchak rasm ham kesib qo'yilgandek ko'rinadi"
+              description="Faqat foni bor (to'rtburchak) rasm uchun. Foni olib tashlangan PNG uchun o'chiring."
             />
 
-            <Group label="Fon ranglari">
+            <Group label="Fon rasmi" hint="Yuklansa, pastdagi ranglar o'rniga shu rasm chiqadi. Keng (16:9) rasm mos.">
+              <MediaField value={background} onChange={onBackground} aspect="video" className="max-w-sm" />
+            </Group>
+
+            <Group label={background ? "Sarlavhachalar rangi" : "Fon ranglari"}>
               <div className="space-y-3">
                 {(["from", "via", "to", "label"] as const).map((key) => (
                   <ColorRow

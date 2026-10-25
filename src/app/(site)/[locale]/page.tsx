@@ -22,7 +22,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const [portfolioMedia, marquee, heroMedia, videos] = await Promise.all([
     getMediaMap([settings.portfolio.coverId, ...Object.values(settings.portfolio.covers)]),
     partnerConfig.enabled ? getPartners({ marqueeOnly: true, limit: partnerConfig.marqueeCount }) : [],
-    hero.layout === "profile" ? getMediaMap([hero.photoId]) : Promise.resolve<MediaMap>({}),
+    hero.layout === "profile" ? getMediaMap([hero.photoId, hero.backgroundId]) : Promise.resolve<MediaMap>({}),
     getVideos({ limit: 5 }),
   ]);
 
@@ -45,6 +45,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           available={available}
           cta={cta}
           gradient={hero.gradient}
+          background={hero.backgroundId ? (heroMedia[hero.backgroundId] ?? null) : null}
           blendPhoto={hero.photoBlend}
         />
       ) : (

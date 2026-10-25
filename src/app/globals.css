@@ -184,6 +184,18 @@ html.lenis body {
   }
 }
 
+/*
+ * A cut-out portrait (transparent PNG) stands on the card's bottom edge
+ * beside the text and needs nothing. Stacked on a phone it sits mid-card,
+ * where the straight cut across the shirt would show — so it fades out.
+ */
+@media (max-width: 1023px) {
+  .hero-photo-cutout {
+    -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
+    mask-image: linear-gradient(to bottom, #000 78%, transparent);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
   .animate-rise,

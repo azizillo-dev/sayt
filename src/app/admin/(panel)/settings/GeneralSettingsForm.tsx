@@ -17,14 +17,16 @@ interface Props {
   initial: General;
   /** Resolved from `hero.photoId` — settings store only the id. */
   heroPhoto: MediaAsset | null;
+  heroBackground: MediaAsset | null;
   smtpConfigured: boolean;
 }
 
-export function GeneralSettingsForm({ initial, heroPhoto, smtpConfigured }: Props) {
+export function GeneralSettingsForm({ initial, heroPhoto, heroBackground, smtpConfigured }: Props) {
   const toast = useToast();
   const [pending, startTransition] = useTransition();
   const [retranslate, setRetranslate] = useState(false);
   const [photo, setPhoto] = useState(heroPhoto);
+  const [backdrop, setBackdrop] = useState(heroBackground);
   const { value, setValue, dirty, markSaved } = useDirtyState(initial);
 
   const setGroup = <K extends keyof General>(key: K, patch: Partial<General[K]>) =>
@@ -56,6 +58,11 @@ export function GeneralSettingsForm({ initial, heroPhoto, smtpConfigured }: Prop
         onPhoto={(asset) => {
           setPhoto(asset);
           setGroup("hero", { photoId: asset?.id ?? null });
+        }}
+        background={backdrop}
+        onBackground={(asset) => {
+          setBackdrop(asset);
+          setGroup("hero", { backgroundId: asset?.id ?? null });
         }}
       />
 

@@ -19,6 +19,8 @@ interface Props {
   available: string | null;
   cta: { work: string; contact: string };
   gradient: { from: string; via: string; to: string; label: string };
+  /** The designer's backdrop image; without it the gradient colours are drawn. */
+  background: MediaAsset | null;
   /** Fade the photo's edge into the gradient — essential for rectangular photos. */
   blendPhoto: boolean;
 }
@@ -32,7 +34,7 @@ const PAD = "px-6 sm:px-9 lg:px-14";
  *
  * The entrance is CSS-only (`animate-rise`), so it plays before hydration.
  */
-export function HeroProfile({ name, role, photo, columns, tagline, available, cta, gradient, blendPhoto }: Props) {
+export function HeroProfile({ name, role, photo, columns, tagline, available, cta, gradient, background, blendPhoto }: Props) {
   const facts = columns.filter((c) => c.title.trim() || c.items.length);
 
   return (
@@ -43,8 +45,21 @@ export function HeroProfile({ name, role, photo, columns, tagline, available, ct
           // A portrait needs the full height; without one the card only needs its text.
           photo ? "min-h-[34rem] lg:min-h-[min(44rem,calc(100svh-var(--header-h)-2rem))]" : "lg:min-h-[32rem]",
         )}
-        style={{ background: heroBackground(gradient) }}
+        style={background ? undefined : { background: heroBackground(gradient) }}
       >
+        {background && (
+          <Picture
+            asset={background}
+            fill
+            priority
+            sizes="(min-width: 1400px) 1336px, 100vw"
+            alt=""
+            // A tall phone card sees only a slice of a wide backdrop: show its
+            // darker left side, where white text and the amber labels stay readable.
+            imgClassName="max-lg:object-[18%_center]"
+          />
+        )}
+
         {/* Without a photo the text simply uses the full card. */}
         <div className={cn(PAD, "relative z-10 pt-7 sm:pt-9 lg:pt-12", photo && "lg:max-w-[62%]")}>
           {available && (
@@ -93,7 +108,8 @@ export function HeroProfile({ name, role, photo, columns, tagline, available, ct
               // lines up with the card's gradient instead of cutting across it.
               "relative mx-auto mt-1 aspect-[var(--hero-photo-ratio)] w-full max-w-[22rem]",
               "lg:absolute lg:bottom-0 lg:right-0 lg:top-auto lg:z-0 lg:mx-0 lg:mt-0 lg:h-[92%] lg:w-auto lg:max-w-[52%]",
-              blendPhoto && "hero-photo-blend",
+              // A cut-out PNG needs no blending beside the text; see globals.css.
+              blendPhoto ? "hero-photo-blend" : "hero-photo-cutout",
             )}
           >
             <Picture

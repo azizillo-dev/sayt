@@ -61,6 +61,8 @@ export const settingsSchema = z.object({
       photoId: z.uuid().nullable().default(null),
       /** Softens the photo's edge into the gradient — needed for rectangular photos. */
       photoBlend: z.boolean().default(true),
+      /** The designer's own backdrop; without one the `gradient` colours are drawn instead. */
+      backgroundId: z.uuid().nullable().default(null),
       columns: z.array(heroColumnSchema).max(4).default([]),
       tagline: localized(),
       gradient: z
