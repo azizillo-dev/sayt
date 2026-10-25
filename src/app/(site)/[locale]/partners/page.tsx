@@ -17,12 +17,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: getDictionary(locale).sections.allPartners };
 }
 
+/**
+ * White in both themes: logos are drawn for a light background, and black
+ * ones vanish on a dark tile. Inverting them instead would wreck brand colours.
+ */
 const tileClass =
-  "relative flex aspect-[3/2] items-center justify-center rounded-card border border-border bg-surface p-8 sm:p-10";
+  "relative flex aspect-[3/2] items-center justify-center rounded-card border border-border bg-white p-8 sm:p-10";
 
-function PartnerTile({ partner, config }: { partner: PartnerItem; config: { invertOnDark: boolean } }) {
+function PartnerTile({ partner }: { partner: PartnerItem }) {
   const logo = (
-    <PartnerLogo partner={partner} invertOnDark={config.invertOnDark} className="h-full w-full" />
+    <PartnerLogo partner={partner} className="h-full w-full" />
   );
   if (!partner.url) return <div className={tileClass}>{logo}</div>;
 
@@ -35,7 +39,7 @@ function PartnerTile({ partner, config }: { partner: PartnerItem; config: { inve
       className={`${tileClass} group transition-[transform,border-color] duration-500 ease-out-expo hover:-translate-y-1 hover:border-accent`}
     >
       {logo}
-      <ArrowUpRight className="absolute right-4 top-4 size-4 text-muted opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <ArrowUpRight className="absolute right-4 top-4 size-4 text-neutral-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
     </a>
   );
 }
@@ -58,7 +62,7 @@ export default async function PartnersPage({ params }: Props) {
         {partners.map((partner, i) => (
           <li key={partner.id}>
             <Reveal delay={(i % 4) * 0.05} y={16}>
-              <PartnerTile partner={partner} config={settings.partners} />
+              <PartnerTile partner={partner} />
             </Reveal>
           </li>
         ))}

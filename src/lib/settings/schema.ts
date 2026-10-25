@@ -119,8 +119,6 @@ export const settingsSchema = z.object({
     .object({
       /** The "all partners" page, and the home-page links to it. */
       enabled: z.boolean().default(true),
-      /** Invert logo colours in dark mode, so black logos stay visible. */
-      invertOnDark: z.boolean().default(false),
     })
     .prefault({}),
 

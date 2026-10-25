@@ -26,14 +26,6 @@ export function PartnersPageSettings({ initial }: { initial: Config }) {
     <Card title="Barcha hamkorlar sahifasi">
       <div className="space-y-4">
         <Switch checked={value.enabled} onChange={(enabled) => set({ enabled })} label="Sahifa yoqilgan" description="O'chirilsa, sahifa va unga olib boruvchi “View All” yashiriladi" />
-        <div className="space-y-3">
-          <Switch
-            checked={value.invertOnDark}
-            onChange={(invertOnDark) => set({ invertOnDark })}
-            label="Tungi rejimda ranglarni teskari qilish"
-            description="Qora logotiplar qorong'i fonda ko'rinishi uchun"
-          />
-        </div>
         <Button variant="primary" onClick={save} loading={pending} disabled={!dirty} icon={<Save className="size-4" />} className="w-full">
           Saqlash
         </Button>

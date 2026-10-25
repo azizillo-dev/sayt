@@ -4,18 +4,16 @@ import { cn } from "@/lib/cn";
 
 interface Props {
   partner: PartnerItem;
-  invertOnDark: boolean;
   eager?: boolean;
   className?: string;
 }
 
 /** Logo fitted inside a fixed box, so every brand gets the same visual weight. */
-export function PartnerLogo({ partner, invertOnDark, eager, className }: Props) {
+export function PartnerLogo({ partner, eager, className }: Props) {
   return (
     <div
       className={cn(
         "flex items-center justify-center",
-        invertOnDark && "dark:invert",
         className,
       )}
     >
@@ -30,7 +28,7 @@ export function PartnerLogo({ partner, invertOnDark, eager, className }: Props) 
           imgClassName="h-full w-full object-contain"
         />
       ) : (
-        <span className="font-display text-lg font-bold tracking-tight">{partner.name}</span>
+        <span className="font-display text-lg font-bold tracking-tight text-neutral-900">{partner.name}</span>
       )}
     </div>
   );
