@@ -4,7 +4,7 @@ import {
   isVideoMime,
   MAX_IMAGE_BYTES,
   MAX_PDF_BYTES,
-  MAX_VIDEO_BYTES,
+  MAX_VIDEO_SOURCE_BYTES,
   MAX_VIDEO_SECONDS,
 } from "@/lib/media/limits";
 import type { MediaAsset } from "@/lib/media/types";
@@ -47,7 +47,7 @@ export async function validateFile(file: File, kind: UploadKind): Promise<VideoI
 
   if (image && file.size > MAX_IMAGE_BYTES) throw new Error(`Rasm ${MAX_IMAGE_BYTES / 1024 / 1024} MB dan katta`);
   if (video) {
-    if (file.size > MAX_VIDEO_BYTES) throw new Error(`Video ${MAX_VIDEO_BYTES / 1024 / 1024} MB dan katta`);
+    if (file.size > MAX_VIDEO_SOURCE_BYTES) throw new Error(`Video ${MAX_VIDEO_SOURCE_BYTES / 1024 / 1024} MB dan katta`);
     const info = await probeVideo(file);
     if (info.duration > MAX_VIDEO_SECONDS + 0.5) {
       throw new Error(
@@ -95,23 +95,39 @@ export async function uploadFile(
   { kind = "any", lossless = false, onProgress }: { kind?: UploadKind; lossless?: boolean; onProgress?: (ratio: number) => void } = {},
 ): Promise<MediaAsset> {
   const videoInfo = await validateFile(file, kind);
+  if (videoInfo) return uploadVideo(file, videoInfo.duration, onProgress);
 
+  const ticket = await store(file, undefined, onProgress);
+  onProgress?.(1);
+  return postJson<MediaAsset>("/api/admin/upload/complete", { ticket, lossless });
+}
+
+/** Steps one and two: reserve a place, put the bytes there. Returns the ticket. */
+async function store(file: File, duration: number | undefined, onProgress?: (ratio: number) => void): Promise<string> {
   const { uploadUrl, ticket } = await postJson<{ uploadUrl: string; ticket: string }>("/api/admin/upload", {
     fileName: file.name,
     mimeType: file.type,
     size: file.size,
-    duration: videoInfo?.duration,
+    duration,
   });
-
   await putFile(uploadUrl, file, onProgress);
-  onProgress?.(1);
+  return ticket;
+}
 
-  return postJson<MediaAsset>("/api/admin/upload/complete", {
-    ticket,
-    lossless,
-    width: videoInfo?.width,
-    height: videoInfo?.height,
-  });
+/**
+ * Videos are re-encoded for the web first (see transcode.ts): the first half
+ * of the progress bar is that, the second half the upload of both files.
+ */
+async function uploadVideo(file: File, duration: number, onProgress?: (ratio: number) => void): Promise<MediaAsset> {
+  const { transcodeVideo } = await import("./transcode");
+  const out = await transcodeVideo(file, (p) => onProgress?.(p * 0.5));
+  const total = out.video.size + out.preview.size;
+  const ticket = await store(out.video, duration, (p) => onProgress?.(0.5 + ((p * out.video.size) / total) * 0.5));
+  const previewTicket = await store(out.preview, Math.min(duration, 8), (p) =>
+    onProgress?.(0.5 + ((out.video.size + p * out.preview.size) / total) * 0.5),
+  );
+  onProgress?.(1);
+  return postJson<MediaAsset>("/api/admin/upload/complete", { ticket, previewTicket, width: out.width, height: out.height });
 }
 
 export async function uploadPdf(file: File, onProgress?: (ratio: number) => void): Promise<{ key: string; url: string; fileName: string }> {

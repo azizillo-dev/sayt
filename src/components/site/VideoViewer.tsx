@@ -194,7 +194,9 @@ export function VideoViewer({ items, initialIndex, labels, basePath }: Props) {
                   muted
                   loop
                   playsInline
-                  preload={near ? "auto" : "metadata"}
+                  // Only the reel on screen loads in full; its neighbours fetch just
+                  // enough to start at once; the rest nothing until they come near.
+                  preload={index === active ? "auto" : near ? "metadata" : "none"}
                   onClick={togglePlay}
                   className="absolute inset-0 size-full cursor-pointer object-cover"
                 />

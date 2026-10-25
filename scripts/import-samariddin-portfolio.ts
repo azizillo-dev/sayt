@@ -43,7 +43,7 @@ async function video(name: string): Promise<string> {
   if (existing) return existing.id;
   const key = originalKey("video/mp4", "video");
   await storage.put(key, await readFile(path.join(filesDir, name)), "video/mp4");
-  const saved = await ingestVideo({ key, mimeType: "video/mp4", fileName, width: 1080, height: 1920 });
+  const saved = await ingestVideo({ key, mimeType: "video/mp4", fileName, width: 1080, height: 1920, previewKey: null });
   console.log(`Video: ${name}`);
   return saved.id;
 }
@@ -141,7 +141,7 @@ async function stockMedia(name: string, kind: "image" | "video"): Promise<string
   await storage.put(key, await readFile(path.join(stockDir, fileName.replace("mixkit-demo-", ""))), mimeType);
   return kind === "image"
     ? (await ingestImage({ key, mimeType, fileName, lossless: false })).id
-    : (await ingestVideo({ key, mimeType, fileName, width: 720, height: 1280 })).id;
+    : (await ingestVideo({ key, mimeType, fileName, width: 720, height: 1280, previewKey: null })).id;
 }
 
 for (const [index, clip] of stockClips.entries()) {

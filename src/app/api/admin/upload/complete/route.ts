@@ -20,6 +20,7 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => null)) as {
     ticket?: unknown;
+    previewTicket?: unknown;
     lossless?: unknown;
     width?: unknown;
     height?: unknown;
@@ -41,7 +42,10 @@ export async function POST(request: Request) {
     const width = Math.round(Number(body?.width));
     const height = Math.round(Number(body?.height));
     if (!(width > 0 && height > 0)) return error("Video o'lchamini aniqlab bo'lmadi");
-    return Response.json(await ingestVideo({ ...ticket, width, height }));
+    // Optional: uploads from before browser transcoding have no preview.
+    const preview = body?.previewTicket ? await readTicket(body.previewTicket) : null;
+    if (body?.previewTicket && !preview) return error("Yuklash muddati tugadi — qaytadan urinib ko'ring", 400);
+    return Response.json(await ingestVideo({ ...ticket, width, height, previewKey: preview?.key ?? null }));
   } catch (e) {
     if (e instanceof MediaError) return error(e.message);
     console.error("[upload]", e);

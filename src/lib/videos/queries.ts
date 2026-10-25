@@ -9,6 +9,8 @@ export interface VideoDisplayItem {
   title: string;
   cover: MediaAsset;
   src: string;
+  /** Light silent version for looping cards; older uploads have none. */
+  preview: string | null;
 }
 
 export async function getVideos({ publishedOnly = true, limit }: { publishedOnly?: boolean; limit?: number } = {}): Promise<VideoDisplayItem[]> {
@@ -21,7 +23,7 @@ export async function getVideos({ publishedOnly = true, limit }: { publishedOnly
     const cover = media[row.coverId];
     const video = media[row.videoId];
     return cover?.kind === "image" && video?.kind === "video"
-      ? [{ id: row.id, title: row.title, cover, src: video.url }]
+      ? [{ id: row.id, title: row.title, cover, src: video.url, preview: video.preview }]
       : [];
   });
 }

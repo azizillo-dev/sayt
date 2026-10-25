@@ -98,11 +98,20 @@ export async function ingestImage({ key, mimeType, fileName, lossless }: Ingest 
 /**
  * Short videos are stored untouched — the browser reports their size and
  * duration before upload (see the admin uploader), and the server re-checks
- * the byte size. Transcoding would need ffmpeg, which is not worth it for
- * short reels that designers already export for the web.
+ * the byte size. They arrive already re-encoded for the web — the browser
+ * does that (components/admin/media/transcode.ts) — together with a light
+ * preview, kept as the row's only variant.
  */
-export async function ingestVideo({ key, mimeType, fileName, width, height }: Ingest & { width: number; height: number }) {
+export async function ingestVideo({
+  key,
+  mimeType,
+  fileName,
+  width,
+  height,
+  previewKey,
+}: Ingest & { width: number; height: number; previewKey: string | null }) {
   const body = await readOriginal(key, MAX_VIDEO_BYTES);
+  if (previewKey) await readOriginal(previewKey, MAX_VIDEO_BYTES);
 
   const [saved] = await db
     .insert(schema.media)
@@ -115,6 +124,7 @@ export async function ingestVideo({ key, mimeType, fileName, width, height }: In
       sizeBytes: body.length,
       width,
       height,
+      variants: previewKey ? [{ format: "mp4", key: previewKey, width, height }] : [],
     })
     .returning();
   return toAsset(saved!);
@@ -150,6 +160,7 @@ export function toAsset(row: Media): MediaAsset {
       .join(", ");
 
   const largestWebp = row.variants.filter((v) => v.format === "webp").sort((a, b) => b.width - a.width)[0];
+  const preview = row.variants.find((v) => v.format === "mp4");
 
   return {
     id: row.id,
@@ -164,6 +175,7 @@ export function toAsset(row: Media): MediaAsset {
     sources: row.variants.length
       ? (["avif", "webp"] as const).map((format) => ({ format, srcSet: byFormat(format) })).filter((s) => s.srcSet)
       : [],
+    preview: preview ? storage.publicUrl(preview.key) : null,
   };
 }
 
