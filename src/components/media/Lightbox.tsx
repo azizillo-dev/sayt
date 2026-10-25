@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { MediaAsset } from "@/lib/media/types";
+import { lockPageScroll } from "@/lib/scroll-lock";
 import { Picture } from "./Picture";
 
 interface Props {
@@ -93,12 +94,10 @@ export function Lightbox({ items, index, onChange, labels }: Props) {
       if (e.key === "ArrowRight") go(1);
       if (e.key === "ArrowLeft") go(-1);
     };
-    const root = document.documentElement;
-    const previous = root.style.overflow;
-    root.style.overflow = "hidden";
+    const unlock = lockPageScroll();
     window.addEventListener("keydown", onKey);
     return () => {
-      root.style.overflow = previous;
+      unlock();
       window.removeEventListener("keydown", onKey);
     };
   }, [open, close, go]);

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BackLink } from "@/components/site/BackLink";
 import { VideoViewer } from "@/components/site/VideoViewer";
 import { resolveLocale } from "@/lib/content/navigation";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -22,8 +21,12 @@ export default async function VideoPage({ params }: Props) {
   const initialIndex = videos.findIndex((item) => item.id === id);
   if (initialIndex < 0) notFound();
   const dict = getDictionary(locale);
-  return <section className="pt-[calc(var(--header-h)+1rem)]">
-    <div className="mx-auto max-w-[1400px] px-5 sm:px-8"><BackLink fallback={`/${locale}/videos`} label={dict.common.back} home={{ href: `/${locale}`, label: dict.nav.home }} /></div>
-    <VideoViewer items={videos} initialIndex={initialIndex} labels={dict.videos} />
-  </section>;
+  return (
+    <VideoViewer
+      items={videos}
+      initialIndex={initialIndex}
+      labels={{ ...dict.videos, close: dict.common.close, play: dict.common.play }}
+      basePath={`/${locale}/videos`}
+    />
+  );
 }
