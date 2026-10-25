@@ -4,19 +4,17 @@ import { cn } from "@/lib/cn";
 
 interface Props {
   partner: PartnerItem;
-  grayscale: boolean;
   invertOnDark: boolean;
   eager?: boolean;
   className?: string;
 }
 
 /** Logo fitted inside a fixed box, so every brand gets the same visual weight. */
-export function PartnerLogo({ partner, grayscale, invertOnDark, eager, className }: Props) {
+export function PartnerLogo({ partner, invertOnDark, eager, className }: Props) {
   return (
     <div
       className={cn(
-        "flex items-center justify-center transition-[filter,opacity] duration-500",
-        grayscale && "opacity-60 grayscale hover:opacity-100 hover:grayscale-0",
+        "flex items-center justify-center",
         invertOnDark && "dark:invert",
         className,
       )}

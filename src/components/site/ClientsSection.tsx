@@ -19,9 +19,12 @@ interface Props {
   gradient: SiteSettings["hero"]["gradient"];
 }
 
-/** Five to a row on larger screens, three on a phone; a short row is centred. */
-const WIDTH = "w-[calc((100%-1.5rem)/3)] sm:w-[calc((100%-4rem)/5)]";
-const TILE = "flex aspect-[5/4] items-center justify-center rounded-2xl bg-[#363b88] p-3 shadow-[0_14px_30px_-18px_rgba(0,0,0,.6)] sm:p-4";
+/** Tile height; widths follow from the logo strip and the fixed last tile. */
+const TILE = "flex h-20 items-center justify-center rounded-2xl shadow-[0_14px_30px_-18px_rgba(0,0,0,.6)] sm:h-28";
+/** Seconds each logo takes to cross its own width — sets the strip's speed. */
+const SECONDS_PER_LOGO = 3;
+/** The strip is repeated until it is at least this long, so it never shows a gap. */
+const MIN_STRIP = 10;
 
 /** "50+ projects" with the companies behind them — trust, right after the hero. */
 export function ClientsSection({ count, title, text, partners, more, background, gradient }: Props) {
@@ -60,29 +63,52 @@ export function ClientsSection({ count, title, text, partners, more, background,
           </div>
         )}
 
-        <ul className="mt-3 flex flex-wrap justify-center gap-3 sm:gap-4">
-          {partners.map((partner) => (
-            <li key={partner.id} className={`${WIDTH} ${TILE}`} title={partner.name}>
-              {partner.logo ? (
-                <Picture asset={partner.logo} alt={partner.name} sizes="160px" bare className="h-full w-full" // Every logo in white: brand colours (often black) vanish on the indigo tile.
-                  imgClassName="h-full w-full object-contain brightness-0 invert" />
-              ) : (
-                <span className="text-center font-display text-base font-bold text-white sm:text-lg">{partner.name}</span>
-              )}
-            </li>
-          ))}
+        <div className="mt-3 flex gap-3 sm:gap-4">
+          {partners.length > 0 && <LogoStrip partners={partners} />}
           {more && (
-            <li className={WIDTH}>
-              <Link
-                href={more.href}
-                className={`${TILE} w-full text-center font-display text-sm font-bold text-white transition-[background-color,transform] duration-300 hover:-translate-y-1 hover:bg-[#4249a3] sm:text-xl`}
-              >
-                {more.label}
-              </Link>
-            </li>
+            <Link
+              href={more.href}
+              className={`${TILE} w-24 shrink-0 bg-[#363b88] px-2 text-center font-display text-sm font-bold text-white transition-[background-color,transform] duration-300 hover:-translate-y-1 hover:bg-[#4249a3] sm:w-44 sm:text-xl`}
+            >
+              {more.label}
+            </Link>
           )}
-        </ul>
+        </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Partner logos drifting left without end, in their own colours. The list is
+ * repeated to fill the strip, then doubled so the loop seam is invisible:
+ * the track moves by exactly half its length and starts over.
+ */
+function LogoStrip({ partners }: { partners: PartnerItem[] }) {
+  const copies = Math.ceil(MIN_STRIP / partners.length);
+  const strip = Array.from({ length: copies }, () => partners).flat();
+  return (
+    <div className="min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_6%,#000_94%,transparent)]">
+      <ul
+        className="marquee-track flex w-max gap-3 sm:gap-4"
+        style={{ ["--marquee-duration" as string]: `${strip.length * SECONDS_PER_LOGO}s` }}
+      >
+        {[...strip, ...strip].map((partner, i) => (
+          // The second half only repeats the first, so it is hidden from screen readers.
+          <li
+            key={i}
+            aria-hidden={i >= strip.length || undefined}
+            title={partner.name}
+            className={`${TILE} w-32 shrink-0 bg-white px-4 sm:w-48 sm:px-6`}
+          >
+            {partner.logo ? (
+              <Picture asset={partner.logo} alt={partner.name} sizes="192px" loading="eager" bare className="h-3/4 w-full" imgClassName="h-full w-full object-contain" />
+            ) : (
+              <span className="text-center font-display text-base font-bold text-[#1d2251] sm:text-lg">{partner.name}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

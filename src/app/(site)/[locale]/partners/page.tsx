@@ -20,9 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const tileClass =
   "relative flex aspect-[3/2] items-center justify-center rounded-card border border-border bg-surface p-8 sm:p-10";
 
-function PartnerTile({ partner, config }: { partner: PartnerItem; config: { grayscale: boolean; invertOnDark: boolean } }) {
+function PartnerTile({ partner, config }: { partner: PartnerItem; config: { invertOnDark: boolean } }) {
   const logo = (
-    <PartnerLogo partner={partner} grayscale={config.grayscale} invertOnDark={config.invertOnDark} className="h-full w-full" />
+    <PartnerLogo partner={partner} invertOnDark={config.invertOnDark} className="h-full w-full" />
   );
   if (!partner.url) return <div className={tileClass}>{logo}</div>;
 

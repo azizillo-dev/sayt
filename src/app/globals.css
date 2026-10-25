@@ -111,6 +111,16 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
+/* Endless logo strip — pure CSS, so it costs no main-thread time. */
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 30s) linear infinite;
+}
+
 /* Hero entrance — CSS only, so it plays before (and without) JavaScript. */
 @keyframes rise {
   from {
@@ -180,6 +190,7 @@ html.lenis body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .marquee-track,
   .animate-rise,
   .animate-pulse-ring {
     animation: none;

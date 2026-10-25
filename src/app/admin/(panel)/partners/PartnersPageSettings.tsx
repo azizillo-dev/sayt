@@ -27,7 +27,6 @@ export function PartnersPageSettings({ initial }: { initial: Config }) {
       <div className="space-y-4">
         <Switch checked={value.enabled} onChange={(enabled) => set({ enabled })} label="Sahifa yoqilgan" description="O'chirilsa, sahifa va unga olib boruvchi “View All” yashiriladi" />
         <div className="space-y-3">
-          <Switch checked={value.grayscale} onChange={(grayscale) => set({ grayscale })} label="Oq-qora" description="Ustiga borganda rangli bo'ladi (shu sahifada)" />
           <Switch
             checked={value.invertOnDark}
             onChange={(invertOnDark) => set({ invertOnDark })}

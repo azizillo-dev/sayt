@@ -35,13 +35,13 @@ export function ClientsSettings({ initial }: { initial: Config }) {
           <Field label="Raqam">
             <Input value={value.count} onChange={(e) => set({ count: e.target.value })} placeholder="50+" maxLength={12} />
           </Field>
-          <Field label="Logotiplar soni" hint="Ro'yxatdagi birinchi hamkorlar">
+          <Field label="Logotiplar soni" hint="Aylanib turadi; ro'yxatdagi birinchilari">
             <Input
               type="number"
               min={0}
-              max={11}
+              max={40}
               value={value.logoCount}
-              onChange={(e) => set({ logoCount: Math.min(11, Math.max(0, Number(e.target.value) || 0)) })}
+              onChange={(e) => set({ logoCount: Math.min(40, Math.max(0, Number(e.target.value) || 0)) })}
             />
           </Field>
         </div>

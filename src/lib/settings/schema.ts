@@ -109,8 +109,8 @@ export const settingsSchema = z.object({
         "Создавал логотипы, баннеры, дизайн для соцсетей, каталоги и другие графические материалы для разных компаний и проектов.",
         "Logos, banners, social media designs, catalogues and other graphic design for a range of companies and projects.",
       ),
-      /** Logo tiles before the "all partners" tile. */
-      logoCount: z.number().int().min(0).max(11).default(4),
+      /** How many partners travel in the logo strip. */
+      logoCount: z.number().int().min(0).max(40).default(12),
       moreLabel: localized("Loyihalar", "Проекты", "Projects"),
     })
     .prefault({}),
@@ -119,8 +119,6 @@ export const settingsSchema = z.object({
     .object({
       /** The "all partners" page, and the home-page links to it. */
       enabled: z.boolean().default(true),
-      /** Mute logos to grey until hovered. Off by default — brand colours read better. */
-      grayscale: z.boolean().default(false),
       /** Invert logo colours in dark mode, so black logos stay visible. */
       invertOnDark: z.boolean().default(false),
     })
