@@ -98,6 +98,23 @@ export const settingsSchema = z.object({
     })
     .prefault({}),
 
+  /** "50+ projects" card with the first partner logos, between the hero and the portfolio. */
+  clients: z
+    .object({
+      enabled: z.boolean().default(true),
+      count: z.string().trim().max(12).default("50+"),
+      title: localized("Loyiha va kompaniya bilan ishlaganman", "Проектов и компаний, с которыми я работал", "Projects and companies I've worked with"),
+      text: localized(
+        "Turli kompaniya va loyihalar uchun logo, banner, ijtimoiy tarmoq dizaynlari, katalog va boshqa grafik dizayn materiallarini yaratganman.",
+        "Создавал логотипы, баннеры, дизайн для соцсетей, каталоги и другие графические материалы для разных компаний и проектов.",
+        "Logos, banners, social media designs, catalogues and other graphic design for a range of companies and projects.",
+      ),
+      /** Logo tiles before the "all partners" tile. */
+      logoCount: z.number().int().min(0).max(11).default(4),
+      moreLabel: localized("Loyihalar", "Проекты", "Projects"),
+    })
+    .prefault({}),
+
   partners: z
     .object({
       enabled: z.boolean().default(true),

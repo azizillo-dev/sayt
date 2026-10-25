@@ -9,6 +9,25 @@ import { portfolioCategories, type PortfolioCategory } from "@/lib/portfolio/cat
 
 type Covers = Record<PortfolioCategory, MediaAsset | null>;
 
+/**
+ * The lit seam where the image meets the bar, as in the brief: a hairline
+ * of light with a soft glow spilling onto the picture.
+ */
+function EdgeLight({ edge }: { edge: "top" | "bottom" }) {
+  const top = edge === "top";
+  return (
+    <div aria-hidden="true" className={`pointer-events-none absolute inset-x-0 z-20 ${top ? "top-0" : "bottom-0"}`}>
+      {/* The beam itself, with a halo so it reads as light rather than a border. */}
+      <div className="h-[2px] bg-[linear-gradient(90deg,transparent,rgba(160,190,255,.7)_15%,#f4f7ff_50%,rgba(160,190,255,.7)_85%,transparent)] shadow-[0_0_12px_2px_rgba(150,185,255,.85)]" />
+      {/* The glow it casts onto the picture. */}
+      <div
+        className={`absolute inset-x-0 h-24 sm:h-32 ${top ? "top-0" : "bottom-0"}`}
+        style={{ background: `radial-gradient(55% 100% at 50% ${top ? "0%" : "100%"}, rgba(140,175,255,.75), rgba(140,175,255,.18) 45%, transparent 75%)` }}
+      />
+    </div>
+  );
+}
+
 export function PortfolioCategories({ locale, covers, fallback }: { locale: Locale; covers: Covers; fallback: MediaAsset | null }) {
   const [active, setActive] = useState<PortfolioCategory>("logo-branding");
   const cover = covers[active] ?? fallback;
@@ -22,6 +41,8 @@ export function PortfolioCategories({ locale, covers, fallback }: { locale: Loca
         {cover && <div aria-hidden="true" className="absolute inset-0 scale-110 bg-cover bg-center opacity-35 blur-2xl" style={{ backgroundImage: `url(${cover.url})` }} />}
         {cover ? <Picture key={cover.id} asset={cover} fill fit="contain" sizes="(min-width: 1400px) 1100px, 100vw" alt={portfolioCategories.find((category) => category.slug === active)?.title ?? "Portfolio"} className="absolute inset-0 z-10" imgClassName="object-center" />
           : <div className="absolute inset-0 bg-[url('/portfolio-studio.webp')] bg-cover bg-center" role="img" aria-label="Dizayn studiyasi" />}
+        <EdgeLight edge="top" />
+        <EdgeLight edge="bottom" />
         {!covers[active] && !fallback && <p className="absolute inset-x-0 top-6 text-center font-display text-2xl font-bold text-white drop-shadow-lg sm:top-10 sm:text-5xl">{portfolioCategories.find((category) => category.slug === active)?.title}</p>}
       </div>
       <nav aria-label="Portfolio bo‘limlari" className="grid grid-cols-2 gap-2 bg-[linear-gradient(105deg,#424171,#171d43_70%,#0e1737)] p-3 sm:grid-cols-4 sm:gap-3 sm:p-5">

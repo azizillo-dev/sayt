@@ -52,7 +52,7 @@ export function MarqueeSettings({ initial }: { initial: Config }) {
     });
 
   return (
-    <Card title="Aylanish sozlamalari" className="h-fit xl:sticky xl:top-6">
+    <Card title="Aylanish sozlamalari">
       <div className="space-y-4">
         <Switch checked={value.enabled} onChange={(enabled) => set({ enabled })} label="Hamkorlar bo'limi" description="O'chirilsa, bo'lim va sahifa yashiriladi" />
         <Range label="Harakatdagi logotiplar soni" value={value.marqueeCount} min={3} max={40} unit="ta" onChange={(marqueeCount) => set({ marqueeCount })} />

@@ -70,6 +70,22 @@ export async function saveGeneralSettings(
   });
 }
 
+/** The "50+" card; texts are filled from Uzbek like the rest of the settings. */
+export async function saveClientsSettings(
+  input: SiteSettings["clients"],
+  retranslate: boolean,
+): Promise<ActionResult<SiteSettings["clients"]>> {
+  await requireAdmin();
+  return run(async () => {
+    const data = settingsSchema.shape.clients.parse(input);
+    const t = await autoTranslateBundle({ title: data.title, text: data.text, moreLabel: data.moreLabel }, retranslate);
+    const clients = { ...data, title: t.title, text: t.text, moreLabel: t.moreLabel };
+    await saveSettings({ ...(await getSettings()), clients });
+    revalidateSite();
+    return ok(clients);
+  });
+}
+
 export async function savePartnerSettings(input: SiteSettings["partners"]): Promise<ActionResult> {
   await requireAdmin();
   return run(async () => {

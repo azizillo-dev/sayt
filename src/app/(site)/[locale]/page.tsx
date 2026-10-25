@@ -1,3 +1,4 @@
+import { ClientsSection } from "@/components/site/ClientsSection";
 import { ContactSection } from "@/components/site/ContactSection";
 import { Hero } from "@/components/site/Hero";
 import { HeroProfile } from "@/components/site/HeroProfile";
@@ -17,13 +18,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const locale = await resolveLocale(params);
   const dict = getDictionary(locale);
   const settings = await getSettings();
-  const { hero, partners: partnerConfig } = settings;
+  const { hero, clients, partners: partnerConfig } = settings;
 
-  const [portfolioMedia, marquee, heroMedia, videos] = await Promise.all([
+  const [portfolioMedia, marquee, heroMedia, videos, clientLogos] = await Promise.all([
     getMediaMap([settings.portfolio.coverId, ...Object.values(settings.portfolio.covers)]),
     partnerConfig.enabled ? getPartners({ marqueeOnly: true, limit: partnerConfig.marqueeCount }) : [],
     hero.layout === "profile" ? getMediaMap([hero.photoId, hero.backgroundId]) : Promise.resolve<MediaMap>({}),
     getVideos({ limit: 5 }),
+    clients.enabled && clients.logoCount > 0 ? getPartners({ limit: clients.logoCount }) : [],
   ]);
 
   const available = hero.available ? hero.availableText[locale] : null;
@@ -50,6 +52,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         />
       ) : (
         <Hero title={hero.title[locale]} subtitle={hero.subtitle[locale]} available={available} cta={cta} />
+      )}
+
+      {clients.enabled && (
+        <ClientsSection
+          count={clients.count}
+          title={clients.title[locale]}
+          text={clients.text[locale]}
+          partners={clientLogos}
+          more={partnerConfig.enabled ? { href: `/${locale}/partners`, label: clients.moreLabel[locale] } : null}
+          background={hero.backgroundId ? (heroMedia[hero.backgroundId] ?? null) : null}
+          gradient={hero.gradient}
+        />
       )}
 
       <PortfolioCategories locale={locale} covers={Object.fromEntries(
