@@ -22,7 +22,7 @@ interface Draft {
 
 const emptyDraft: Draft = { id: null, name: "", logo: null, url: "", showInMarquee: true };
 
-export function PartnerManager({ initial, marqueeCount }: { initial: PartnerItem[]; marqueeCount: number }) {
+export function PartnerManager({ initial, homeCount }: { initial: PartnerItem[]; homeCount: number }) {
   const toast = useToast();
   const [partners, setPartners] = useState(initial);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -77,7 +77,7 @@ export function PartnerManager({ initial, marqueeCount }: { initial: PartnerItem
   return (
     <Card
       title={`Logotiplar (${partners.length})`}
-      description={`Tartibni surib o'zgartiring. Bosh sahifada birinchi ${marqueeCount} tasi aylanadi.`}
+      description={`Tartibni surib o'zgartiring. Bosh sahifadagi tajriba blokida belgilanganlarning birinchi ${homeCount} tasi chiqadi.`}
       actions={
         <Button variant="primary" size="sm" icon={<Plus className="size-4" />} onClick={() => setDraft(emptyDraft)}>
           Qo&apos;shish
@@ -105,7 +105,7 @@ export function PartnerManager({ initial, marqueeCount }: { initial: PartnerItem
                   ) : (
                     "havolasiz"
                   )}
-                  {!p.showInMarquee && " · aylanmaydi"}
+                  {!p.showInMarquee && " · bosh sahifada yo'q"}
                 </p>
               </div>
               <IconButton label="Tahrirlash" onClick={() => edit(p)}>
@@ -145,7 +145,7 @@ export function PartnerManager({ initial, marqueeCount }: { initial: PartnerItem
             <Field label="Havola (ixtiyoriy)" hint="Faqat “Barcha hamkorlar” sahifasida bosiladigan bo'ladi">
               <Input value={draft.url} onChange={(e) => setDraft({ ...draft, url: e.target.value })} placeholder="https://…" type="url" />
             </Field>
-            <Switch checked={draft.showInMarquee} onChange={(showInMarquee) => setDraft({ ...draft, showInMarquee })} label="Bosh sahifada aylansin" />
+            <Switch checked={draft.showInMarquee} onChange={(showInMarquee) => setDraft({ ...draft, showInMarquee })} label="Bosh sahifada ko'rinsin" description="Hero ostidagi tajriba blokida" />
           </div>
         )}
       </Dialog>

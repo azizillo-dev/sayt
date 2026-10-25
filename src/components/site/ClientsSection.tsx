@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Picture } from "@/components/media/Picture";
 import type { PartnerItem } from "@/lib/content/queries";
@@ -46,7 +47,20 @@ export function ClientsSection({ count, title, text, partners, more, background,
           </div>
         </div>
 
-        <ul className="mt-4 flex flex-wrap justify-center gap-3 sm:mt-5 sm:gap-4">
+        {more && (
+          <div className="mt-5 flex justify-end sm:mt-6">
+            {/* "View All" stays in English in every language — the client asked for it. */}
+            <Link
+              href={more.href}
+              className="group inline-flex items-center gap-1.5 text-sm font-semibold text-white/85 transition-colors hover:text-white sm:text-[15px]"
+            >
+              View All
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </div>
+        )}
+
+        <ul className="mt-3 flex flex-wrap justify-center gap-3 sm:gap-4">
           {partners.map((partner) => (
             <li key={partner.id} className={`${WIDTH} ${TILE}`} title={partner.name}>
               {partner.logo ? (

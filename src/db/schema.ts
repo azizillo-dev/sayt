@@ -171,7 +171,7 @@ export const partners = pgTable("partners", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   logoId: uuid("logo_id").references(() => media.id, { onDelete: "set null" }),
-  /** Only used on the "all partners" page — marquee logos are not links. */
+  /** Only used on the "all partners" page — home-page logos are not links. */
   url: text("url"),
   showInMarquee: boolean("show_in_marquee").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),

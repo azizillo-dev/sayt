@@ -2,7 +2,6 @@ import { ClientsSection } from "@/components/site/ClientsSection";
 import { ContactSection } from "@/components/site/ContactSection";
 import { Hero } from "@/components/site/Hero";
 import { HeroProfile } from "@/components/site/HeroProfile";
-import { PartnersMarquee } from "@/components/site/PartnersMarquee";
 import { PortfolioCategories } from "@/components/site/PortfolioCategories";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { VideoCard } from "@/components/site/VideoCard";
@@ -20,12 +19,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const settings = await getSettings();
   const { hero, clients, partners: partnerConfig } = settings;
 
-  const [portfolioMedia, marquee, heroMedia, videos, clientLogos] = await Promise.all([
+  const [portfolioMedia, heroMedia, videos, clientLogos] = await Promise.all([
     getMediaMap([settings.portfolio.coverId, ...Object.values(settings.portfolio.covers)]),
-    partnerConfig.enabled ? getPartners({ marqueeOnly: true, limit: partnerConfig.marqueeCount }) : [],
     hero.layout === "profile" ? getMediaMap([hero.photoId, hero.backgroundId]) : Promise.resolve<MediaMap>({}),
     getVideos({ limit: 5 }),
-    clients.enabled && clients.logoCount > 0 ? getPartners({ limit: clients.logoCount }) : [],
+    clients.enabled && clients.logoCount > 0 ? getPartners({ marqueeOnly: true, limit: clients.logoCount }) : [],
   ]);
 
   const available = hero.available ? hero.availableText[locale] : null;
@@ -74,16 +72,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <SectionHeader title={dict.videos.title} action={{ href: `/${locale}/videos`, label: dict.common.viewAll }} />
         <div className="flex flex-wrap justify-center gap-3 sm:gap-5">{videos.map((item) => <div key={item.id} className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.875rem)] lg:w-[calc(25%-1rem)]"><VideoCard item={item} locale={locale} /></div>)}</div>
       </section>}
-
-      {marquee.length > 0 && (
-        <section className="py-16 sm:py-24">
-          <div className="mx-auto max-w-[1400px] px-5 sm:px-8">
-            {/* "View All" stays in English in every language — the client asked for it. */}
-            <SectionHeader title={dict.sections.partners} action={{ href: `/${locale}/partners`, label: "View All" }} />
-          </div>
-          <PartnersMarquee partners={marquee} config={partnerConfig} />
-        </section>
-      )}
 
       <ContactSection
         locale={locale}

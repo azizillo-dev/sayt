@@ -111,23 +111,6 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
-/* Partner marquee — pure CSS so it never costs main-thread time. */
-@keyframes marquee {
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-.marquee-track {
-  animation: marquee var(--marquee-duration, 40s) linear infinite;
-  animation-direction: var(--marquee-direction, normal);
-}
-.marquee[data-pause="true"]:hover .marquee-track {
-  animation-play-state: paused;
-}
-.marquee-mask {
-  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-}
-
 /* Hero entrance — CSS only, so it plays before (and without) JavaScript. */
 @keyframes rise {
   from {
@@ -197,7 +180,6 @@ html.lenis body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track,
   .animate-rise,
   .animate-pulse-ring {
     animation: none;

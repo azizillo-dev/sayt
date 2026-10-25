@@ -117,13 +117,8 @@ export const settingsSchema = z.object({
 
   partners: z
     .object({
+      /** The "all partners" page, and the home-page links to it. */
       enabled: z.boolean().default(true),
-      /** How many logos travel in the home-page marquee. */
-      marqueeCount: z.number().int().min(3).max(40).default(12),
-      /** Scroll speed in pixels per second. */
-      speed: z.number().int().min(10).max(300).default(60),
-      direction: z.enum(["left", "right"]).default("left"),
-      pauseOnHover: z.boolean().default(false),
       /** Mute logos to grey until hovered. Off by default — brand colours read better. */
       grayscale: z.boolean().default(false),
       /** Invert logo colours in dark mode, so black logos stay visible. */
