@@ -99,6 +99,40 @@ export const projectTranslations = pgTable(
   (t) => [primaryKey({ columns: [t.projectId, t.locale] })],
 );
 
+// Four visual portfolio collections shown below the home-page hero.
+export const portfolioItems = pgTable(
+  "portfolio_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    category: text("category").notNull(),
+    title: text("title").notNull(),
+    coverId: uuid("cover_id").references(() => media.id, { onDelete: "set null" }),
+    galleryIds: jsonb("gallery_ids").$type<string[]>().notNull().default([]),
+    openMode: text("open_mode").notNull().default("gallery"),
+    pdfKey: text("pdf_key"),
+    pdfName: text("pdf_name"),
+    isPublished: boolean("is_published").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index("portfolio_category_order_idx").on(t.category, t.sortOrder)],
+);
+
+// Short portrait films shown as reels on the home page and in the video gallery.
+export const videoItems = pgTable(
+  "video_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    coverId: uuid("cover_id").notNull().references(() => media.id, { onDelete: "restrict" }),
+    videoId: uuid("video_id").notNull().references(() => media.id, { onDelete: "restrict" }),
+    isPublished: boolean("is_published").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index("video_items_order_idx").on(t.sortOrder)],
+);
+
 // ── Pages (About + custom "More" menu pages) ─────────────────
 
 export const pages = pgTable(
@@ -176,6 +210,8 @@ export const messages = pgTable(
 
 export type Media = typeof media.$inferSelect;
 export type Project = typeof projects.$inferSelect;
+export type PortfolioItem = typeof portfolioItems.$inferSelect;
+export type VideoItem = typeof videoItems.$inferSelect;
 export type Page = typeof pages.$inferSelect;
 export type Partner = typeof partners.$inferSelect;
 export type SocialLink = typeof socialLinks.$inferSelect;

@@ -16,6 +16,8 @@ npm run dev                   # http://localhost:3000  ·  admin: /admin
 
 Production: `npm run build && npm start`.
 
+Lokal bazada production ko'rinishini sinash: `npm run local:build && npm run local:start` (http://localhost:3100). Oddiy `next build` `.env.production.local` ni o'qiydi va production bazaga ulanadi.
+
 Telefon ko'rinishini tekshirish (dev server ishlab turganda): `npm run audit:mobile` — har bir sahifa telefon o'lchamida ochiladi, gorizontal scroll bor-yo'qligi tekshiriladi va `audit/` papkasiga skrinshot yoziladi.
 
 ## Asosiy imkoniyatlar

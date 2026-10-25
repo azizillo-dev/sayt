@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { MediaAsset } from "@/lib/media/types";
 import { Picture } from "./Picture";
@@ -15,28 +15,76 @@ interface Props {
 }
 
 const SWIPE_THRESHOLD = 60;
+const DOUBLE_CLICK_MS = 300;
+/**
+ * Clicks this soon after opening are ignored: a visitor who double-taps the
+ * card that opens the viewer would otherwise land the second tap on the image
+ * as a "single tap" and close what they just opened.
+ */
+const OPEN_GRACE_MS = 400;
+/** Zoom aims for this much larger than the image as shown… */
+const ZOOM_FACTOR = 2.5;
+/** …but never below this, even when the original file is small. */
+const MIN_ZOOM_FACTOR = 1.6;
 
-/** Full-screen image viewer: arrows / Esc on keyboard, swipe on touch, click to zoom. */
+/** Where a tap landed, as a fraction of the image, so zoom can centre on it. */
+interface Focus {
+  x: number;
+  y: number;
+}
+
+/** Full-screen image viewer: arrows / Esc, swipe, double click to zoom, single click to close. */
 export function Lightbox({ items, index, onChange, labels }: Props) {
   const open = index !== null;
-  const [zoomed, setZoomed] = useState(false);
+  /** Zoomed width in px, or null when the image fits the screen. */
+  const [zoomWidth, setZoomWidth] = useState<number | null>(null);
+  const zoomed = zoomWidth !== null;
+  const stageRef = useRef<HTMLDivElement>(null);
+  const focus = useRef<Focus | null>(null);
+  const openedAt = useRef(0);
   const touchX = useRef<number | null>(null);
+  const pendingClick = useRef<number | null>(null);
+  const lastClickAt = useRef(0);
+
+  useEffect(() => {
+    if (open) openedAt.current = Date.now();
+  }, [open]);
+  const justOpened = () => Date.now() - openedAt.current < OPEN_GRACE_MS;
   // Portals need `document`, which does not exist during server rendering.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const clearPendingClick = useCallback(() => {
+    if (pendingClick.current !== null) window.clearTimeout(pendingClick.current);
+    pendingClick.current = null;
+    lastClickAt.current = 0;
+  }, []);
+  useEffect(() => clearPendingClick, [clearPendingClick]);
+
   const go = useCallback(
     (delta: number) => {
       if (index === null) return;
-      setZoomed(false);
+      clearPendingClick();
+      setZoomWidth(null);
       onChange((index + delta + items.length) % items.length);
     },
-    [index, items.length, onChange],
+    [clearPendingClick, index, items.length, onChange],
   );
   const close = useCallback(() => {
-    setZoomed(false);
+    clearPendingClick();
+    setZoomWidth(null);
     onChange(null);
-  }, [onChange]);
+  }, [clearPendingClick, onChange]);
+
+  // After zooming in, scroll so the point that was tapped sits mid-screen.
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    const target = focus.current;
+    if (!zoomed || !stage || !target) return;
+    stage.scrollLeft = target.x * stage.scrollWidth - stage.clientWidth / 2;
+    stage.scrollTop = target.y * stage.scrollHeight - stage.clientHeight / 2;
+    focus.current = null;
+  }, [zoomed]);
 
   useEffect(() => {
     if (!open) return;
@@ -73,7 +121,7 @@ export function Lightbox({ items, index, onChange, labels }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={close}
+          onClick={() => !justOpened() && close()}
           onTouchStart={(e) => (touchX.current = e.touches[0]?.clientX ?? null)}
           onTouchEnd={(e) => {
             const start = touchX.current;
@@ -84,23 +132,47 @@ export function Lightbox({ items, index, onChange, labels }: Props) {
         >
           <motion.div
             key={current.id}
-            className={`relative ${zoomed ? "h-full w-full overflow-auto" : "max-h-[90dvh] max-w-[92vw]"}`}
+            ref={stageRef}
+            className={`relative ${zoomed ? "flex h-full w-full overflow-auto" : "max-h-[90dvh] max-w-[92vw]"}`}
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => {
               e.stopPropagation();
-              setZoomed((z) => !z);
+              if (justOpened()) return;
+              const now = Date.now();
+              if (now - lastClickAt.current >= DOUBLE_CLICK_MS) {
+                // Possibly the first of two clicks: close only if no second one follows.
+                lastClickAt.current = now;
+                pendingClick.current = window.setTimeout(close, DOUBLE_CLICK_MS);
+                return;
+              }
+              clearPendingClick();
+              if (zoomed) {
+                setZoomWidth(null);
+                return;
+              }
+              const img = e.currentTarget.querySelector("img");
+              if (!img) return;
+              const shown = img.getBoundingClientRect();
+              focus.current = {
+                x: (e.clientX - shown.left) / shown.width,
+                y: (e.clientY - shown.top) / shown.height,
+              };
+              // Up to the file's own resolution, so zooming reveals detail
+              // instead of enlarging pixels — with a floor for small files.
+              setZoomWidth(Math.max(shown.width * MIN_ZOOM_FACTOR, Math.min(shown.width * ZOOM_FACTOR, current.width)));
             }}
-            style={{ cursor: zoomed ? "zoom-out" : "zoom-in" }}
+            style={{ cursor: zoomed ? "zoom-out" : "zoom-in", touchAction: "manipulation" }}
           >
-            <Picture
-              asset={current}
-              sizes="100vw"
-              priority
-              className={zoomed ? "min-w-full" : "max-h-[90dvh] w-auto"}
-              imgClassName={zoomed ? "max-w-none w-[200%] sm:w-auto" : "max-h-[90dvh] w-auto"}
-            />
+            {/* Zoomed: m-auto, not justify-center — it centres a smaller image without clipping a larger one. */}
+            {zoomed ? (
+              <div className="m-auto shrink-0" style={{ width: zoomWidth }}>
+                <Picture asset={current} sizes={`${Math.round(zoomWidth)}px`} priority className="w-full" />
+              </div>
+            ) : (
+              <Picture asset={current} sizes="100vw" priority className="max-h-[90dvh] w-auto" imgClassName="max-h-[90dvh] w-auto" />
+            )}
           </motion.div>
 
           <button type="button" onClick={close} aria-label={labels.close} className={controlClass("right-4 top-4")}>

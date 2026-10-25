@@ -1,6 +1,6 @@
 import { getAdmin } from "@/lib/auth/session";
 import { isImageMime } from "@/lib/media/limits";
-import { ingestImage, ingestVideo, MediaError } from "@/lib/media/service";
+import { ingestImage, ingestPdf, ingestVideo, MediaError } from "@/lib/media/service";
 import { readTicket } from "@/lib/media/ticket";
 
 /**
@@ -31,6 +31,9 @@ export async function POST(request: Request) {
   try {
     if (isImageMime(ticket.mimeType)) {
       return Response.json(await ingestImage({ ...ticket, lossless: body?.lossless === true }));
+    }
+    if (ticket.mimeType === "application/pdf") {
+      return Response.json(await ingestPdf(ticket));
     }
 
     // The browser measured these before uploading; without them the player

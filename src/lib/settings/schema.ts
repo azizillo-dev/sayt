@@ -83,6 +83,19 @@ export const settingsSchema = z.object({
     })
     .prefault({}),
 
+  portfolio: z
+    .object({
+      /** Legacy fallback when individual category images have not been chosen. */
+      coverId: z.uuid().nullable().default(null),
+      covers: z.object({
+        "logo-branding": z.uuid().nullable().default(null),
+        "social-media": z.uuid().nullable().default(null),
+        "advertising-design": z.uuid().nullable().default(null),
+        "visual-design": z.uuid().nullable().default(null),
+      }).prefault({}),
+    })
+    .prefault({}),
+
   partners: z
     .object({
       enabled: z.boolean().default(true),

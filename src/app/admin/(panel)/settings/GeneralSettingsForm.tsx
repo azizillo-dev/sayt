@@ -59,27 +59,13 @@ export function GeneralSettingsForm({ initial, heroPhoto, smtpConfigured }: Prop
         }}
       />
 
-      <Card title="Loyihalar">
-        <div className="space-y-4">
-          <Switch
-            checked={value.projects.showAllOnHome}
-            onChange={(showAllOnHome) => setGroup("projects", { showAllOnHome })}
-            label="Barcha loyihalarni bosh sahifada ko'rsatish"
-            description="Yoqilsa, alohida “Loyihalar” bo'limi yashiriladi"
-          />
-          {!value.projects.showAllOnHome && (
-            <Field label="Bosh sahifadagi tanlangan loyihalar soni" hint="Ko'proq bo'lsa, “Hammasini ko'rish” tugmasi chiqadi">
-              <Input
-                type="number"
-                min={1}
-                max={50}
-                value={value.projects.featuredLimit}
-                onChange={(e) => setGroup("projects", { featuredLimit: Math.min(50, Math.max(1, Number(e.target.value) || 1)) })}
-                className="w-32"
-              />
-            </Field>
-          )}
-        </div>
+      <Card title="Eski loyihalar arxivi" description="Bosh sahifadagi yangi portfolio bo'limlari Portfolio menyusidan boshqariladi.">
+        <Switch
+          checked={!value.projects.showAllOnHome}
+          onChange={(showArchive) => setGroup("projects", { showAllOnHome: !showArchive })}
+          label="Eski loyihalar sahifasini menyuda ko'rsatish"
+          description="Yoqilsa, avvalgi maqola ko'rinishidagi loyihalar Ko'proq menyusida qoladi"
+        />
       </Card>
 
       <Card title="Bog'lanish" description="Sayt pastidagi forma va xabarlar qayerga borishi">

@@ -17,6 +17,7 @@ const TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
   ".mp4": "video/mp4",
   ".webm": "video/webm",
+  ".pdf": "application/pdf",
 };
 
 export async function GET(request: Request, { params }: { params: Promise<{ key: string[] }> }) {
@@ -30,6 +31,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ key:
       "Content-Type": type,
       "Cache-Control": "public, max-age=31536000, immutable",
       "Accept-Ranges": "bytes",
+      ...(type === "application/pdf" ? { "Content-Disposition": "inline" } : {}),
       // Uploaded SVGs must never run scripts, even if opened directly.
       ...(type === "image/svg+xml" ? { "Content-Security-Policy": "script-src 'none'" } : {}),
     };

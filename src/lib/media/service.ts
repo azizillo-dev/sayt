@@ -4,7 +4,7 @@ import { inArray } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { Media } from "@/db/schema";
 import { storage } from "@/lib/storage";
-import { MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from "./limits";
+import { MAX_IMAGE_BYTES, MAX_PDF_BYTES, MAX_VIDEO_BYTES } from "./limits";
 import { isSafeSvg, processImage, svgDimensions } from "./process-image";
 import type { MediaAsset, MediaMap, MediaVariant } from "./types";
 
@@ -18,13 +18,23 @@ const EXTENSIONS: Record<string, string> = {
   "image/svg+xml": "svg",
   "video/mp4": "mp4",
   "video/webm": "webm",
+  "application/pdf": "pdf",
 };
 
 export class MediaError extends Error {}
 
 /** Where the browser will store an original of this type. */
-export function originalKey(mimeType: string, kind: "image" | "video"): string {
+export function originalKey(mimeType: string, kind: "image" | "video" | "pdf"): string {
   return `uploads/${randomUUID()}/${kind === "video" ? "video" : "original"}.${EXTENSIONS[mimeType]}`;
+}
+
+export async function ingestPdf({ key, fileName }: { key: string; fileName: string }) {
+  const body = await readOriginal(key, MAX_PDF_BYTES);
+  if (body.subarray(0, 5).toString() !== "%PDF-") {
+    await storage.delete([key]);
+    throw new MediaError("Bu haqiqiy PDF fayl emas");
+  }
+  return { key, url: storage.publicUrl(key), fileName };
 }
 
 interface Ingest {
@@ -89,7 +99,7 @@ export async function ingestImage({ key, mimeType, fileName, lossless }: Ingest 
  * Short videos are stored untouched — the browser reports their size and
  * duration before upload (see the admin uploader), and the server re-checks
  * the byte size. Transcoding would need ffmpeg, which is not worth it for
- * 10-second loops that designers already export for the web.
+ * short reels that designers already export for the web.
  */
 export async function ingestVideo({ key, mimeType, fileName, width, height }: Ingest & { width: number; height: number }) {
   const body = await readOriginal(key, MAX_VIDEO_BYTES);

@@ -6,6 +6,7 @@ const uz = {
     more: "Ko'proq",
     projects: "Loyihalar",
     partners: "Hamkorlar",
+    videos: "Videolar",
     home: "Bosh sahifa",
   },
   common: {
@@ -55,6 +56,22 @@ const uz = {
   footer: {
     rights: "Barcha huquqlar himoyalangan.",
   },
+  portfolio: {
+    pickWork: "Ishni tanlang va ichidagi materiallarni ko'ring",
+    empty: "Bu bo'limga hali ish qo'shilmagan.",
+    works: "Portfolio ishlari",
+    openGallery: "Rasmlarni ko'rish uchun markazdagi ishni bosing",
+    openPdf: "PDFni ochish uchun markazdagi ishni bosing",
+    gallery: "galereya",
+    previous: "Oldingi ish",
+    next: "Keyingi ish",
+  },
+  videos: {
+    title: "Videolar",
+    empty: "Hozircha video qo'shilmagan.",
+    feed: "Videolar tasmasi",
+    scrollHint: "Pastga aylantiring",
+  },
   empty: {
     projects: "Hozircha loyihalar yo'q.",
   },
@@ -68,6 +85,7 @@ const ru: Dictionary = {
     more: "Ещё",
     projects: "Проекты",
     partners: "Партнёры",
+    videos: "Видео",
     home: "Главная",
   },
   common: {
@@ -117,6 +135,22 @@ const ru: Dictionary = {
   footer: {
     rights: "Все права защищены.",
   },
+  portfolio: {
+    pickWork: "Выберите работу, чтобы посмотреть материалы",
+    empty: "В этом разделе пока нет работ.",
+    works: "Работы портфолио",
+    openGallery: "Нажмите на работу в центре, чтобы открыть галерею",
+    openPdf: "Нажмите на работу в центре, чтобы открыть PDF",
+    gallery: "галерея",
+    previous: "Предыдущая работа",
+    next: "Следующая работа",
+  },
+  videos: {
+    title: "Видео",
+    empty: "Видео пока нет.",
+    feed: "Лента видео",
+    scrollHint: "Листайте вниз",
+  },
   empty: {
     projects: "Проектов пока нет.",
   },
@@ -128,6 +162,7 @@ const en: Dictionary = {
     more: "More",
     projects: "Projects",
     partners: "Partners",
+    videos: "Videos",
     home: "Home",
   },
   common: {
@@ -176,6 +211,22 @@ const en: Dictionary = {
   },
   footer: {
     rights: "All rights reserved.",
+  },
+  portfolio: {
+    pickWork: "Select a project to explore its work",
+    empty: "No work has been added to this section yet.",
+    works: "Portfolio work",
+    openGallery: "Select the project in the centre to open its gallery",
+    openPdf: "Select the project in the centre to open its PDF",
+    gallery: "gallery",
+    previous: "Previous project",
+    next: "Next project",
+  },
+  videos: {
+    title: "Videos",
+    empty: "No videos yet.",
+    feed: "Video feed",
+    scrollHint: "Scroll down",
   },
   empty: {
     projects: "No projects yet.",

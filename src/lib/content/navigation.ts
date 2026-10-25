@@ -28,6 +28,7 @@ export async function buildNavigation(locale: Locale, settings: SiteSettings, di
 
   const more: NavLink[] = [];
   if (!settings.projects.showAllOnHome) more.push({ href: `/${locale}/projects`, label: dict.nav.projects });
+  more.push({ href: `/${locale}/videos`, label: dict.nav.videos });
   if (settings.partners.enabled) more.push({ href: `/${locale}/partners`, label: dict.nav.partners });
   more.push(...pages.map((p) => ({ href: `/${locale}/${p.slug}`, label: p.title })));
 

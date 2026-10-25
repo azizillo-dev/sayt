@@ -3,6 +3,7 @@ import {
   isImageMime,
   isVideoMime,
   MAX_IMAGE_BYTES,
+  MAX_PDF_BYTES,
   MAX_VIDEO_BYTES,
   MAX_VIDEO_SECONDS,
 } from "@/lib/media/limits";
@@ -111,4 +112,17 @@ export async function uploadFile(
     width: videoInfo?.width,
     height: videoInfo?.height,
   });
+}
+
+export async function uploadPdf(file: File, onProgress?: (ratio: number) => void): Promise<{ key: string; url: string; fileName: string }> {
+  if (file.type !== "application/pdf" || !file.name.toLowerCase().endsWith(".pdf")) throw new Error("PDF faylni tanlang");
+  if (file.size > MAX_PDF_BYTES) throw new Error(`PDF ${MAX_PDF_BYTES / 1024 / 1024} MB dan katta`);
+  const { uploadUrl, ticket } = await postJson<{ uploadUrl: string; ticket: string }>("/api/admin/upload", {
+    fileName: file.name,
+    mimeType: file.type,
+    size: file.size,
+  });
+  await putFile(uploadUrl, file, onProgress);
+  onProgress?.(1);
+  return postJson<{ key: string; url: string; fileName: string }>("/api/admin/upload/complete", { ticket });
 }

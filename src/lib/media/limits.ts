@@ -18,8 +18,9 @@ export const VIDEO_MIME_TYPES = ["video/mp4", "video/webm"] as const;
  */
 export const MAX_IMAGE_BYTES = 40 * 1024 * 1024;
 export const MAX_VIDEO_BYTES = 40 * 1024 * 1024;
-/** Short loops live on the site; anything longer belongs on YouTube. */
-export const MAX_VIDEO_SECONDS = 10;
+export const MAX_PDF_BYTES = 40 * 1024 * 1024;
+/** Portrait reels can run longer than the short loops used in project pages. */
+export const MAX_VIDEO_SECONDS = 60;
 
 /**
  * Every stored file lives at a key unique to its upload, so it never changes.

@@ -8,6 +8,20 @@
       "when": 1790093410570,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792768248567,
+      "tag": "0001_faithful_rattler",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792910918574,
+      "tag": "0002_complete_bedlam",
+      "breakpoints": true
     }
   ]
 }

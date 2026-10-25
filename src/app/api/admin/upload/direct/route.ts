@@ -1,5 +1,5 @@
 import { getAdmin } from "@/lib/auth/session";
-import { MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from "@/lib/media/limits";
+import { MAX_IMAGE_BYTES, MAX_PDF_BYTES, MAX_VIDEO_BYTES } from "@/lib/media/limits";
 import { storage } from "@/lib/storage";
 
 /**
@@ -20,7 +20,7 @@ export async function PUT(request: Request) {
   }
 
   const body = Buffer.from(await request.arrayBuffer());
-  if (body.length > Math.max(MAX_IMAGE_BYTES, MAX_VIDEO_BYTES)) {
+  if (body.length > Math.max(MAX_IMAGE_BYTES, MAX_VIDEO_BYTES, MAX_PDF_BYTES)) {
     return Response.json({ error: "Fayl juda katta" }, { status: 413 });
   }
 

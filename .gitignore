@@ -14,5 +14,7 @@ next-env.d.ts
 npm-debug.log*
 .DS_Store
 audit/
-dev.log
-prod.log
+*.log
+
+# Client briefs (voice notes, exports) — private, never in the repository
+requirements/

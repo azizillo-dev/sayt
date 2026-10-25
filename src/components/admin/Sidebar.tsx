@@ -10,6 +10,8 @@ import {
   Mail,
   Menu,
   Paintbrush,
+  Images,
+  Clapperboard,
   Settings,
   Share2,
   User,
@@ -33,6 +35,8 @@ interface NavItem {
 const nav: NavItem[] = [
   { href: "/admin", label: "Boshqaruv", icon: LayoutDashboard, exact: true },
   { href: "/admin/projects", label: "Loyihalar", icon: FolderKanban },
+  { href: "/admin/portfolio", label: "Portfolio", icon: Images },
+  { href: "/admin/videos", label: "Videolar", icon: Clapperboard },
   { href: "/admin/partners", label: "Hamkorlar", icon: Handshake },
   { href: "/admin/about", label: "About", icon: User },
   { href: "/admin/pages", label: "Sahifalar", icon: FileText },

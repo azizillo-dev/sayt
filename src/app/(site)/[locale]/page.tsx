@@ -2,31 +2,30 @@ import { ContactSection } from "@/components/site/ContactSection";
 import { Hero } from "@/components/site/Hero";
 import { HeroProfile } from "@/components/site/HeroProfile";
 import { PartnersMarquee } from "@/components/site/PartnersMarquee";
-import { ProjectGrid } from "@/components/site/ProjectGrid";
+import { PortfolioCategories } from "@/components/site/PortfolioCategories";
 import { SectionHeader } from "@/components/site/SectionHeader";
+import { VideoCard } from "@/components/site/VideoCard";
 import { resolveLocale } from "@/lib/content/navigation";
-import { getPartners, getProjectCards } from "@/lib/content/queries";
+import { getPartners } from "@/lib/content/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMediaMap } from "@/lib/media/service";
-import type { MediaMap } from "@/lib/media/types";
+import type { MediaAsset, MediaMap } from "@/lib/media/types";
 import { getSettings } from "@/lib/settings/service";
+import { getVideos } from "@/lib/videos/queries";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = await resolveLocale(params);
   const dict = getDictionary(locale);
   const settings = await getSettings();
-  const { hero, projects: projectConfig, partners: partnerConfig } = settings;
+  const { hero, partners: partnerConfig } = settings;
 
-  const [projects, marquee, heroMedia] = await Promise.all([
-    getProjectCards(
-      locale,
-      projectConfig.showAllOnHome ? {} : { featuredOnly: true, limit: projectConfig.featuredLimit },
-    ),
+  const [portfolioMedia, marquee, heroMedia, videos] = await Promise.all([
+    getMediaMap([settings.portfolio.coverId, ...Object.values(settings.portfolio.covers)]),
     partnerConfig.enabled ? getPartners({ marqueeOnly: true, limit: partnerConfig.marqueeCount }) : [],
     hero.layout === "profile" ? getMediaMap([hero.photoId]) : Promise.resolve<MediaMap>({}),
+    getVideos({ limit: 5 }),
   ]);
 
-  const showProjectsLink = !projectConfig.showAllOnHome && projects.total > projects.items.length;
   const available = hero.available ? hero.availableText[locale] : null;
   const cta = { work: dict.hero.work, contact: dict.hero.contact };
 
@@ -52,18 +51,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Hero title={hero.title[locale]} subtitle={hero.subtitle[locale]} available={available} cta={cta} />
       )}
 
-      <section id="work" className="mx-auto max-w-[1400px] scroll-mt-24 px-5 py-16 sm:px-8 sm:py-24">
-        <SectionHeader
-          title={projectConfig.showAllOnHome ? dict.sections.allProjects : dict.sections.selectedWork}
-          action={showProjectsLink ? { href: `/${locale}/projects`, label: dict.common.viewAll } : null}
-        />
-        <ProjectGrid
-          projects={projects.items}
-          locale={locale}
-          viewLabel={dict.common.view}
-          emptyLabel={dict.empty.projects}
-        />
-      </section>
+      <PortfolioCategories locale={locale} covers={Object.fromEntries(
+        Object.entries(settings.portfolio.covers).map(([key, id]) => [key, id ? portfolioMedia[id] ?? null : null]),
+      ) as Record<keyof typeof settings.portfolio.covers, MediaAsset | null>} fallback={settings.portfolio.coverId ? portfolioMedia[settings.portfolio.coverId] ?? null : null} />
+
+      {videos.length > 0 && <section id="videos" className="mx-auto max-w-[1400px] scroll-mt-24 px-5 py-16 sm:px-8 sm:py-24">
+        <SectionHeader title={dict.videos.title} action={{ href: `/${locale}/videos`, label: dict.common.viewAll }} />
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-5">{videos.map((item) => <div key={item.id} className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.875rem)] lg:w-[calc(25%-1rem)]"><VideoCard item={item} locale={locale} /></div>)}</div>
+      </section>}
 
       {marquee.length > 0 && (
         <section className="py-16 sm:py-24">

@@ -60,7 +60,7 @@ export function Dropzone({ kind, multiple, onFiles, progress, inline, className,
           <UploadCloud className="size-5 text-muted sm:size-6" />
           <span className="text-[13px] font-semibold sm:text-sm">{multiple ? "Fayllarni tanlang" : "Faylni tanlang"}</span>
           <span className="text-[11px] leading-snug text-muted">
-            {kind === "video" ? "MP4 / WebM, 10 soniyagacha" : kind === "image" ? "JPG, PNG, WebP, AVIF, GIF, SVG, TIFF" : "Rasm yoki 10 soniyali video"}
+            {kind === "video" ? "MP4 / WebM, 60 soniyagacha" : kind === "image" ? "JPG, PNG, WebP, AVIF, GIF, SVG, TIFF" : "Rasm yoki 60 soniyali video"}
           </span>
         </>
       )}

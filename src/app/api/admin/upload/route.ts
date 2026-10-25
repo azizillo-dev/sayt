@@ -3,6 +3,7 @@ import {
   isImageMime,
   isVideoMime,
   MAX_IMAGE_BYTES,
+  MAX_PDF_BYTES,
   MAX_VIDEO_BYTES,
   MAX_VIDEO_SECONDS,
 } from "@/lib/media/limits";
@@ -39,13 +40,14 @@ export async function POST(request: Request) {
 
   const image = isImageMime(mimeType);
   const video = isVideoMime(mimeType);
-  if (!image && !video) {
-    return error("Bu format qo'llab-quvvatlanmaydi. Rasm: JPG, PNG, WebP, AVIF, GIF, TIFF, SVG. Video: MP4, WebM.");
+  const pdf = mimeType === "application/pdf";
+  if (!image && !video && !pdf) {
+    return error("Bu format qo'llab-quvvatlanmaydi. Rasm, qisqa video yoki PDF yuklang.");
   }
 
-  const limit = image ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
+  const limit = image ? MAX_IMAGE_BYTES : video ? MAX_VIDEO_BYTES : MAX_PDF_BYTES;
   if (!(size > 0)) return error("Fayl bo'sh");
-  if (size > limit) return error(`${image ? "Rasm" : "Video"} hajmi ${mb(limit)} MB dan oshmasin`);
+  if (size > limit) return error(`${pdf ? "PDF" : image ? "Rasm" : "Video"} hajmi ${mb(limit)} MB dan oshmasin`);
 
   if (video) {
     const duration = typeof body?.duration === "number" ? body.duration : 0;
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
     }
   }
 
-  const key = originalKey(mimeType, image ? "image" : "video");
+  const key = originalKey(mimeType, pdf ? "pdf" : image ? "image" : "video");
 
   return Response.json({
     uploadUrl: await storage.uploadUrl(key, mimeType),
