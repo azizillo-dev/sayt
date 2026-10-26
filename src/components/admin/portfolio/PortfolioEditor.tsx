@@ -84,7 +84,7 @@ export function PortfolioEditor({ initial, initialMedia }: { initial: FormValue;
           </Field>
         </div>
       </Card>
-      <Card title="Muqova rasmi" description="Bo'limdagi markaziy va yon kartalarda shu rasm ko'rinadi.">
+      <Card title="Muqova rasmi" description="Bo'limdagi ishlar ro'yxatida shu rasm ko'rinadi. Ish ochilganda birinchi bo'lib ham shu chiqadi.">
         <MediaField value={cover} onChange={(asset) => {
           if (asset) addMedia(asset);
           set({ coverId: asset?.id ?? null });
@@ -104,7 +104,7 @@ export function PortfolioEditor({ initial, initialMedia }: { initial: FormValue;
               assets.forEach(addMedia);
               set({ galleryIds: assets.map((asset) => asset.id) });
             }} />
-            <p className="mt-2 text-xs text-muted">Rasmlarni sudrab tartiblang. Muqova galereyaga avtomatik qo'shilmaydi.</p>
+            <p className="mt-2 text-xs text-muted">Ish ochilganda muqovadan keyin shu rasmlar chiqadi (Social Media'da — yonma-yon aylanadi). Sudrab tartiblang.</p>
           </div> : <div className="space-y-3">
             <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-bg p-4 text-center hover:border-accent">
               <FileText className="size-5" />

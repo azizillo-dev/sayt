@@ -4,11 +4,12 @@ import { getMediaMap } from "@/lib/media/service";
 import { getSettings } from "@/lib/settings/service";
 import { GeneralSettingsForm } from "./GeneralSettingsForm";
 import { PasswordForm } from "./PasswordForm";
+import { StatementSettings } from "./StatementSettings";
 
 export const metadata: Metadata = { title: "Sozlamalar" };
 
 export default async function SettingsPage() {
-  const { brand, hero, projects, contact, seo } = await getSettings();
+  const { brand, hero, projects, contact, seo, statement } = await getSettings();
   const smtpConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD);
   const media = await getMediaMap([hero.photoId, hero.backgroundId]);
 
@@ -21,6 +22,9 @@ export default async function SettingsPage() {
         heroBackground={hero.backgroundId ? (media[hero.backgroundId] ?? null) : null}
         smtpConfigured={smtpConfigured}
       />
+      <div className="mt-6">
+        <StatementSettings initial={statement} />
+      </div>
       <div className="mt-10">
         <PasswordForm />
       </div>

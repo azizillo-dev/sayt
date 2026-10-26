@@ -121,6 +121,27 @@ html.lenis body {
   animation: marquee var(--marquee-duration, 30s) linear infinite;
 }
 
+/*
+ * Portfolio banner: the incoming picture slides in as the outgoing one
+ * slides out, both the same way. "next" moves leftwards, "prev" rightwards.
+ */
+@keyframes banner-in-next { from { transform: translate3d(100%, 0, 0); } }
+@keyframes banner-out-next { to { transform: translate3d(-100%, 0, 0); } }
+@keyframes banner-in-prev { from { transform: translate3d(-100%, 0, 0); } }
+@keyframes banner-out-prev { to { transform: translate3d(100%, 0, 0); } }
+.banner-in-next,
+.banner-out-next,
+.banner-in-prev,
+.banner-out-prev {
+  animation-duration: 0.9s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-fill-mode: both;
+}
+.banner-in-next { animation-name: banner-in-next; }
+.banner-out-next { animation-name: banner-out-next; }
+.banner-in-prev { animation-name: banner-in-prev; }
+.banner-out-prev { animation-name: banner-out-prev; }
+
 /* Hero entrance — CSS only, so it plays before (and without) JavaScript. */
 @keyframes rise {
   from {
@@ -191,6 +212,10 @@ html.lenis body {
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
+  .banner-in-next,
+  .banner-out-next,
+  .banner-in-prev,
+  .banner-out-prev,
   .animate-rise,
   .animate-pulse-ring {
     animation: none;

@@ -4,6 +4,7 @@ import { Hero } from "@/components/site/Hero";
 import { HeroProfile } from "@/components/site/HeroProfile";
 import { PortfolioCategories } from "@/components/site/PortfolioCategories";
 import { SectionHeader } from "@/components/site/SectionHeader";
+import { StatementSection } from "@/components/site/StatementSection";
 import { VideoCard } from "@/components/site/VideoCard";
 import { resolveLocale } from "@/lib/content/navigation";
 import { getPartners } from "@/lib/content/queries";
@@ -17,7 +18,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const locale = await resolveLocale(params);
   const dict = getDictionary(locale);
   const settings = await getSettings();
-  const { hero, clients, partners: partnerConfig } = settings;
+  const { hero, clients, statement, partners: partnerConfig } = settings;
 
   const [portfolioMedia, heroMedia, videos, clientLogos] = await Promise.all([
     getMediaMap([settings.portfolio.coverId, ...Object.values(settings.portfolio.covers)]),
@@ -25,6 +26,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     getVideos({ limit: 5 }),
     clients.enabled && clients.logoCount > 0 ? getPartners({ marqueeOnly: true, limit: clients.logoCount }) : [],
   ]);
+  /** The hero's backdrop, reused by the blocks below it so the page reads as one piece. */
+  const backdrop = hero.backgroundId ? (heroMedia[hero.backgroundId] ?? null) : null;
 
   const available = hero.available ? hero.availableText[locale] : null;
   const cta = { work: dict.hero.work, contact: dict.hero.contact };
@@ -45,7 +48,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           available={available}
           cta={cta}
           gradient={hero.gradient}
-          background={hero.backgroundId ? (heroMedia[hero.backgroundId] ?? null) : null}
+          background={backdrop}
           blendPhoto={hero.photoBlend}
         />
       ) : (
@@ -59,7 +62,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           text={clients.text[locale]}
           partners={clientLogos}
           more={partnerConfig.enabled ? { href: `/${locale}/partners`, label: clients.moreLabel[locale] } : null}
-          background={hero.backgroundId ? (heroMedia[hero.backgroundId] ?? null) : null}
+          background={backdrop}
           gradient={hero.gradient}
         />
       )}
@@ -67,6 +70,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <PortfolioCategories locale={locale} covers={Object.fromEntries(
         Object.entries(settings.portfolio.covers).map(([key, id]) => [key, id ? portfolioMedia[id] ?? null : null]),
       ) as Record<keyof typeof settings.portfolio.covers, MediaAsset | null>} fallback={settings.portfolio.coverId ? portfolioMedia[settings.portfolio.coverId] ?? null : null} />
+
+      {statement.enabled && (
+        <StatementSection
+          word={statement.word[locale]}
+          headline={statement.headline[locale]}
+          text={statement.text[locale]}
+          steps={statement.steps[locale]}
+          background={backdrop}
+          gradient={hero.gradient}
+        />
+      )}
 
       {videos.length > 0 && <section id="videos" className="mx-auto max-w-[1400px] scroll-mt-24 px-5 py-16 sm:px-8 sm:py-24">
         <SectionHeader title={dict.videos.title} action={{ href: `/${locale}/videos`, label: dict.common.viewAll }} />

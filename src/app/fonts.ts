@@ -1,4 +1,4 @@
-import { Inter, Manrope, Montserrat, Onest, Playfair_Display, Unbounded } from "next/font/google";
+import { Inter, Manrope, Montserrat, Onest, Oswald, Playfair_Display, Unbounded } from "next/font/google";
 import type { FontKey } from "@/lib/theme/fonts";
 
 /**
@@ -41,7 +41,19 @@ const playfair = Playfair_Display({
 
 const fonts: Record<FontKey, { variable: string }> = { manrope, inter, onest, montserrat, unbounded, playfair };
 
+/**
+ * Not a theme choice: the tall condensed face of the "DIZAYN" statement,
+ * as in the brief. One weight, fetched only by pages that show it.
+ */
+const condensed = Oswald({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  weight: "700",
+  variable: "--font-condensed",
+  display: "swap",
+  preload: false,
+});
+
 /** Class names that define every `--font-*` variable. */
-export const fontVariables = Object.values(fonts)
+export const fontVariables = [...Object.values(fonts), condensed]
   .map((f) => f.variable)
   .join(" ");

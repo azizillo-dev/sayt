@@ -86,6 +86,22 @@ export async function saveClientsSettings(
   });
 }
 
+/** The "DIZAYN" statement; texts are filled from Uzbek like the rest. */
+export async function saveStatementSettings(
+  input: SiteSettings["statement"],
+  retranslate: boolean,
+): Promise<ActionResult<SiteSettings["statement"]>> {
+  await requireAdmin();
+  return run(async () => {
+    const data = settingsSchema.shape.statement.parse(input);
+    const t = await autoTranslateBundle({ word: data.word, headline: data.headline, text: data.text, steps: data.steps }, retranslate);
+    const statement = { ...data, word: t.word, headline: t.headline, text: t.text, steps: t.steps };
+    await saveSettings({ ...(await getSettings()), statement });
+    revalidateSite();
+    return ok(statement);
+  });
+}
+
 export async function savePartnerSettings(input: SiteSettings["partners"]): Promise<ActionResult> {
   await requireAdmin();
   return run(async () => {

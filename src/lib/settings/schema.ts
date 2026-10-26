@@ -98,6 +98,29 @@ export const settingsSchema = z.object({
     })
     .prefault({}),
 
+  /** The "DIZAYN — turning an idea into a visual language" statement before the videos. */
+  statement: z
+    .object({
+      enabled: z.boolean().default(true),
+      word: localized("DIZAYN", "ДИЗАЙН", "DESIGN"),
+      headline: localized(
+        "BU — G‘OYANI VIZUAL TILGA AYLANTIRISH.",
+        "ЭТО — ПРЕВРАЩЕНИЕ ИДЕИ В ВИЗУАЛЬНЫЙ ЯЗЫК.",
+        "IT IS TURNING AN IDEA INTO A VISUAL LANGUAGE.",
+      ),
+      text: localized(
+        "Dizayn — e’tibor jalb qilish, kerakli xabarni yetkazish va brendni esda qoldirish vositasi.",
+        "Дизайн — это способ привлечь внимание, донести нужное сообщение и сделать бренд запоминающимся.",
+        "Design is how you catch the eye, deliver the right message and make a brand memorable.",
+      ),
+      steps: localized(
+        "Maqsad → G‘oya → Vizual yechim → Natija",
+        "Цель → Идея → Визуальное решение → Результат",
+        "Goal → Idea → Visual solution → Result",
+      ),
+    })
+    .prefault({}),
+
   /** "50+ projects" card with the first partner logos, between the hero and the portfolio. */
   clients: z
     .object({

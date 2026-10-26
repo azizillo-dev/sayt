@@ -65,6 +65,10 @@ const uz = {
     gallery: "galereya",
     previous: "Oldingi ish",
     next: "Keyingi ish",
+    otherWorks: "Boshqa ishlar",
+    pdfTitle: "To'liq taqdimot",
+    pdfOpen: "PDF'ni ochish",
+    zoomHint: "Kattalashtirish uchun rasmni bosing",
   },
   videos: {
     title: "Videolar",
@@ -149,6 +153,10 @@ const ru: Dictionary = {
     gallery: "галерея",
     previous: "Предыдущая работа",
     next: "Следующая работа",
+    otherWorks: "Другие работы",
+    pdfTitle: "Полная презентация",
+    pdfOpen: "Открыть PDF",
+    zoomHint: "Нажмите на изображение, чтобы увеличить",
   },
   videos: {
     title: "Видео",
@@ -231,6 +239,10 @@ const en: Dictionary = {
     gallery: "gallery",
     previous: "Previous project",
     next: "Next project",
+    otherWorks: "More work",
+    pdfTitle: "Full presentation",
+    pdfOpen: "Open PDF",
+    zoomHint: "Select an image to enlarge it",
   },
   videos: {
     title: "Videos",
