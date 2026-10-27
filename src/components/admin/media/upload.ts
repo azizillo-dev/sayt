@@ -92,14 +92,19 @@ function putFile(url: string, file: File, onProgress?: (ratio: number) => void):
  */
 export async function uploadFile(
   file: File,
-  { kind = "any", lossless = false, onProgress }: { kind?: UploadKind; lossless?: boolean; onProgress?: (ratio: number) => void } = {},
+  {
+    kind = "any",
+    lossless = false,
+    trim = false,
+    onProgress,
+  }: { kind?: UploadKind; lossless?: boolean; /** Cut empty margins (logos). */ trim?: boolean; onProgress?: (ratio: number) => void } = {},
 ): Promise<MediaAsset> {
   const videoInfo = await validateFile(file, kind);
   if (videoInfo) return uploadVideo(file, videoInfo.duration, onProgress);
 
   const ticket = await store(file, undefined, onProgress);
   onProgress?.(1);
-  return postJson<MediaAsset>("/api/admin/upload/complete", { ticket, lossless });
+  return postJson<MediaAsset>("/api/admin/upload/complete", { ticket, lossless, trim });
 }
 
 /** Steps one and two: reserve a place, put the bytes there. Returns the ticket. */

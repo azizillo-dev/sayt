@@ -5,7 +5,7 @@ import { db, schema } from "@/db";
 import type { Media } from "@/db/schema";
 import { storage } from "@/lib/storage";
 import { MAX_IMAGE_BYTES, MAX_PDF_BYTES, MAX_VIDEO_BYTES } from "./limits";
-import { isSafeSvg, processImage, svgDimensions } from "./process-image";
+import { isSafeSvg, processImage, svgDimensions, trimRaster, trimSvg } from "./process-image";
 import type { MediaAsset, MediaMap, MediaVariant } from "./types";
 
 const EXTENSIONS: Record<string, string> = {
@@ -49,8 +49,14 @@ interface Ingest {
  * every size and format, then records it. The original is read back from
  * storage, so a 40 MB export never travels through a request body.
  */
-export async function ingestImage({ key, mimeType, fileName, lossless }: Ingest & { lossless: boolean }) {
-  const body = await readOriginal(key, MAX_IMAGE_BYTES);
+export async function ingestImage({
+  key,
+  mimeType,
+  fileName,
+  lossless,
+  trim = false,
+}: Ingest & { lossless: boolean; /** Cut away empty margins — for logos, see trimSvg. */ trim?: boolean }) {
+  let body = await readOriginal(key, MAX_IMAGE_BYTES);
   const id = keyId(key);
   const prefix = `uploads/${id}`;
 
@@ -61,10 +67,16 @@ export async function ingestImage({ key, mimeType, fileName, lossless }: Ingest 
       await storage.delete([key]);
       throw new MediaError("SVG faylda ruxsat etilmagan kod bor");
     }
+    if (trim) {
+      // SVGs are served as stored, so the narrowed one replaces the upload.
+      body = await trimSvg(body);
+      await storage.put(key, body, mimeType);
+    }
     const { width, height } = await svgDimensions(body);
     row = { id, kind: "image", originalKey: key, mimeType, fileName, sizeBytes: body.length, width, height };
   } else {
-    const processed = await processImage(body, { lossless }).catch(async () => {
+    const source = trim ? await trimRaster(body).catch(() => body) : body;
+    const processed = await processImage(source, { lossless }).catch(async () => {
       await storage.delete([key]);
       throw new MediaError("Rasmni o'qib bo'lmadi — fayl buzilgan yoki format qo'llab-quvvatlanmaydi");
     });

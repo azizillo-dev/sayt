@@ -19,6 +19,8 @@ interface Props {
   allowLossless?: boolean;
   /** Round preview (profile photo). */
   round?: boolean;
+  /** Cut away the empty margin around the image — for logos. */
+  trim?: boolean;
   className?: string;
 }
 
@@ -27,7 +29,7 @@ const aspects = { video: "aspect-video", square: "aspect-square", auto: "min-h-3
 const actionClass =
   "inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-bg text-[13px] font-semibold transition-colors hover:border-muted";
 
-export function MediaField({ value, onChange, kind = "image", aspect = "video", allowLossless = true, round, className }: Props) {
+export function MediaField({ value, onChange, kind = "image", aspect = "video", allowLossless = true, round, trim, className }: Props) {
   const toast = useToast();
   const [progress, setProgress] = useState<number | null>(null);
   const [lossless, setLossless] = useState(false);
@@ -36,7 +38,7 @@ export function MediaField({ value, onChange, kind = "image", aspect = "video", 
     if (!file) return;
     setProgress(0);
     try {
-      onChange(await uploadFile(file, { kind, lossless, onProgress: setProgress }));
+      onChange(await uploadFile(file, { kind, lossless, trim, onProgress: setProgress }));
     } catch (error) {
       toast.show((error as Error).message, "error");
     } finally {

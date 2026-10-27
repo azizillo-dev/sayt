@@ -115,3 +115,40 @@ const UNSAFE_SVG = /<script|<foreignObject|\son[a-z]+\s*=|javascript:|<iframe|<e
 export function isSafeSvg(input: Buffer): boolean {
   return !UNSAFE_SVG.test(input.toString("utf8"));
 }
+
+/**
+ * Logos often sit in a large empty canvas, which makes one brand look half
+ * the size of another in identical tiles. These remove that margin so every
+ * logo fills its tile by its own shape. The colour of the corner pixel —
+ * usually transparent — is treated as background.
+ */
+const TRIM_THRESHOLD = 12;
+
+export async function trimRaster(input: Buffer): Promise<Buffer> {
+  return sharp(input).trim({ threshold: TRIM_THRESHOLD }).toBuffer();
+}
+
+/**
+ * The SVG is kept as a vector: it is rendered once to find where the drawing
+ * is, and its viewBox is narrowed to that box. Nothing inside is changed.
+ */
+export async function trimSvg(input: Buffer): Promise<Buffer> {
+  const meta = await sharp(input).metadata();
+  const { info } = await sharp(input).trim({ threshold: TRIM_THRESHOLD }).toBuffer({ resolveWithObject: true });
+  if (!meta.width || !meta.height || info.trimOffsetLeft === undefined || info.trimOffsetTop === undefined) return input;
+
+  const text = input.toString("utf8");
+  const open = text.match(/<svg\b[^>]*>/i)?.[0];
+  if (!open) return input;
+
+  const viewBox = open.match(/viewBox\s*=\s*["']([^"']+)["']/i)?.[1]?.trim().split(/[\s,]+/).map(Number);
+  const [vx, vy, vw, vh] = viewBox?.length === 4 && viewBox.every(Number.isFinite) ? viewBox : [0, 0, meta.width, meta.height];
+  const sx = vw! / meta.width;
+  const sy = vh! / meta.height;
+  const box = [vx! - info.trimOffsetLeft * sx, vy! - info.trimOffsetTop * sy, info.width * sx, info.height * sy].map((n) => +n.toFixed(3));
+
+  const rewritten = open
+    .replace(/\s(viewBox|width|height)\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/^<svg\b/i, `<svg viewBox="${box.join(" ")}" width="${info.width}" height="${info.height}"`);
+  return Buffer.from(text.replace(open, rewritten), "utf8");
+}

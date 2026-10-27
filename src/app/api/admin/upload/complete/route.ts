@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     ticket?: unknown;
     previewTicket?: unknown;
     lossless?: unknown;
+    trim?: unknown;
     width?: unknown;
     height?: unknown;
   } | null;
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
 
   try {
     if (isImageMime(ticket.mimeType)) {
-      return Response.json(await ingestImage({ ...ticket, lossless: body?.lossless === true }));
+      return Response.json(await ingestImage({ ...ticket, lossless: body?.lossless === true, trim: body?.trim === true }));
     }
     if (ticket.mimeType === "application/pdf") {
       return Response.json(await ingestPdf(ticket));

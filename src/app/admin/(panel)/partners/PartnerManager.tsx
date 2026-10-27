@@ -136,8 +136,8 @@ export function PartnerManager({ initial, homeCount }: { initial: PartnerItem[];
       >
         {draft && (
           <div className="space-y-5">
-            <Field label="Logotip" hint="Shaffof fonli PNG yoki SVG eng yaxshi natija beradi">
-              <MediaField value={draft.logo} onChange={(logo) => setDraft({ ...draft, logo })} aspect="video" allowLossless={false} />
+            <Field label="Logotip" hint="Shaffof fonli PNG yoki SVG. Atrofidagi bo'sh joy avtomatik qirqiladi — o'lchamni o'ylash shart emas.">
+              <MediaField value={draft.logo} onChange={(logo) => setDraft({ ...draft, logo })} aspect="video" allowLossless={false} trim />
             </Field>
             <Field label="Nomi">
               <Input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Kompaniya nomi" />
