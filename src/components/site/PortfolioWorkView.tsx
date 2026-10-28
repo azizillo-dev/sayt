@@ -79,7 +79,8 @@ export function PortfolioWorkView({ item, others, categoryTitle, basePath, label
           </div>
         )}
 
-        {item.pdfUrl && (
+        {/* Only when pictures push the button above out of sight — otherwise the two would sit together. */}
+        {item.pdfUrl && rest.length > 0 && (
           <Reveal y={56}>
             <a
               href={item.pdfUrl}

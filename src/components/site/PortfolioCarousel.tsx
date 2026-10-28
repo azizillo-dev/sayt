@@ -53,7 +53,7 @@ export function PortfolioCarousel({ images, title, labels }: Props) {
       }
       touchStart.current = null;
     }}>
-      <div className="relative h-[470px] sm:h-[600px] lg:h-[min(66svh,640px)]" style={{ perspective: "1200px" }}>
+      <div className="relative h-[470px] [--card-h:420px] sm:h-[600px] sm:[--card-h:540px] lg:h-[min(66svh,640px)] lg:[--card-h:min(60svh,580px)]" style={{ perspective: "1200px" }}>
         {images.map((image, index) => {
           let distance = index - active;
           if (distance > count / 2) distance -= count;
@@ -64,11 +64,14 @@ export function PortfolioCarousel({ images, title, labels }: Props) {
             aria-current={index === active ? "true" : undefined}
             aria-hidden={depth > 1}
             tabIndex={depth > 1 ? -1 : 0}
-            className={`group absolute left-1/2 top-1/2 h-[420px] max-w-[86vw] overflow-hidden rounded-[1.25rem] border border-white/20 bg-[#0d0f14] shadow-2xl shadow-black/30 outline-offset-4 transition-[transform,opacity,filter] duration-700 ease-out-expo sm:h-[540px] lg:h-[min(60svh,580px)] ${index === active ? "cursor-zoom-in" : ""}`}
+            className={`group absolute left-1/2 top-1/2 overflow-hidden rounded-[1.25rem] border border-white/20 bg-[#0d0f14] shadow-2xl shadow-black/30 outline-offset-4 transition-[transform,opacity,filter] duration-700 ease-out-expo ${index === active ? "cursor-zoom-in" : ""}`}
             style={{
               // Width follows the picture, so a 1080×1350 post fills its card with
               // no empty bands; extreme shapes are held within a sensible range.
+              // On a narrow phone the height shrinks too, rather than the width
+              // alone — which would leave bands above and below.
               aspectRatio: `${cardRatio(image)}`,
+              height: `min(var(--card-h), calc(86vw / ${cardRatio(image)}))`,
               transform: `translate3d(calc(-50% + ${distance} * min(37vw, 275px)), -50%, ${-depth * 110}px) rotateY(${-distance * 11}deg) scale(${Math.max(0.64, 1 - depth * 0.13)})`,
               opacity: depth > 1 ? 0 : depth === 0 ? 1 : 0.46,
               filter: depth === 0 ? "none" : "blur(3px)",
