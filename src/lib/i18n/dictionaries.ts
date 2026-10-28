@@ -33,7 +33,7 @@ const uz = {
   },
   contact: {
     name: "Ism familiya",
-    contact: "Email yoki telefon raqam",
+    contact: "Telegram yoki telefon raqam",
     message: "Xabar",
     submit: "Bog'lanish",
     sending: "Yuborilmoqda…",
@@ -42,7 +42,7 @@ const uz = {
     sendAnother: "Yana yozish",
     errors: {
       name: "Ismingizni kiriting",
-      contact: "To'g'ri email yoki telefon raqam kiriting",
+      contact: "Telegram (@username) yoki telefon raqam kiriting",
       message: "Xabar kamida 10 ta belgidan iborat bo'lsin",
       rateLimited: "Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring.",
       generic: "Xatolik yuz berdi. Qayta urinib ko'ring.",
@@ -121,7 +121,7 @@ const ru: Dictionary = {
   },
   contact: {
     name: "Имя и фамилия",
-    contact: "Email или номер телефона",
+    contact: "Telegram или номер телефона",
     message: "Сообщение",
     submit: "Связаться",
     sending: "Отправка…",
@@ -130,7 +130,7 @@ const ru: Dictionary = {
     sendAnother: "Написать ещё",
     errors: {
       name: "Введите имя",
-      contact: "Введите корректный email или номер телефона",
+      contact: "Введите Telegram (@username) или номер телефона",
       message: "Сообщение должно содержать минимум 10 символов",
       rateLimited: "Слишком много попыток. Попробуйте позже.",
       generic: "Произошла ошибка. Попробуйте ещё раз.",
@@ -207,7 +207,7 @@ const en: Dictionary = {
   },
   contact: {
     name: "Full name",
-    contact: "Email or phone number",
+    contact: "Telegram or phone number",
     message: "Message",
     submit: "Get in touch",
     sending: "Sending…",
@@ -216,7 +216,7 @@ const en: Dictionary = {
     sendAnother: "Send another",
     errors: {
       name: "Please enter your name",
-      contact: "Enter a valid email or phone number",
+      contact: "Enter a Telegram @username or phone number",
       message: "Message must be at least 10 characters",
       rateLimited: "Too many attempts. Please try again later.",
       generic: "Something went wrong. Please try again.",

@@ -7,7 +7,7 @@ import { Lightbox } from "@/components/media/Lightbox";
 import { Picture } from "@/components/media/Picture";
 import { Reveal } from "@/components/motion/Reveal";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
-import { CONTENT_MAX_H } from "@/lib/media/fit";
+import { CONTENT_MAX_H, widthForHeight } from "@/lib/media/fit";
 import type { PortfolioDisplayItem } from "@/lib/portfolio/queries";
 
 type Labels = Dictionary["portfolio"] & { close: string };
@@ -36,14 +36,20 @@ export function PortfolioWorkView({ item, others, categoryTitle, basePath, label
   return (
     <div className="mx-auto mt-6 grid max-w-[1400px] gap-8 px-5 pb-24 sm:px-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
       <article className="min-w-0">
+        {/*
+          * The frame takes the picture's own proportions — a 1920×1080
+          * presentation and a 1080×1350 post both fill it edge to edge, with
+          * no empty bands. A tall picture is held to the screen height (and
+          * centred) by the same width cap as the content images.
+          */}
         <button
           type="button"
           onClick={() => setOpen(0)}
           aria-label={labels.zoomHint}
-          className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl bg-black sm:aspect-video"
+          style={{ maxWidth: widthForHeight(lead!, CONTENT_MAX_H) }}
+          className="group relative mx-auto block w-full cursor-zoom-in overflow-hidden rounded-2xl bg-surface"
         >
-          <div aria-hidden className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-2xl" style={{ backgroundImage: `url(${lead!.url})` }} />
-          <Picture asset={lead!} fill fit="contain" priority sizes="(min-width: 1024px) 960px, 100vw" alt={item.title} className="absolute inset-0" />
+          <Picture asset={lead!} priority sizes="(min-width: 1024px) 960px, 100vw" alt={item.title} />
           <span className="absolute bottom-3 right-3 grid size-10 place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
             <Maximize2 className="size-4" />
           </span>

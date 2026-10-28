@@ -107,7 +107,7 @@ export function ContactForm({ locale, dict }: { locale: Locale; dict: Dictionary
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label={dict.name} autoComplete="name" required {...bind("name")} />
-              {/* Accepts e-mail or phone, so no inputMode — either keyboard may be needed. */}
+              {/* Accepts a Telegram @username or a phone, so no inputMode — either keyboard may be needed. */}
               <Field label={dict.contact} required {...bind("contact")} />
             </div>
             <Field label={dict.message} multiline required {...bind("message")} />

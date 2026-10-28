@@ -21,7 +21,6 @@ const itemSchema = z.object({
   isPublished: z.boolean(),
 }).superRefine((item, ctx) => {
   if (item.openMode === "pdf" && !item.pdfKey) ctx.addIssue({ code: "custom", path: ["pdfKey"], message: "PDF faylni yuklang" });
-  if (item.openMode === "gallery" && !item.galleryIds.length) ctx.addIssue({ code: "custom", path: ["galleryIds"], message: "Galereyaga rasm qo'shing" });
 });
 
 export type PortfolioItemInput = z.input<typeof itemSchema>;
@@ -53,6 +52,7 @@ export async function savePortfolioItem(input: PortfolioItemInput): Promise<Acti
   await requireAdmin();
   return run(async () => {
     const data = itemSchema.parse(input);
+    // The gallery is optional: a work without one shows its cover alone.
     const ids = [...new Set([data.coverId, ...data.galleryIds])];
     const media = await db.select({ id: schema.media.id, kind: schema.media.kind }).from(schema.media).where(inArray(schema.media.id, ids));
     if (media.length !== ids.length || media.some((item) => item.kind !== "image")) throw new UserError("Rasmlardan biri topilmadi");

@@ -9,6 +9,11 @@ import type { MediaAsset } from "@/lib/media/types";
 
 type Labels = Dictionary["portfolio"] & { close: string };
 
+/** Narrowest and widest card the carousel allows (width / height). */
+const MIN_RATIO = 9 / 16;
+const MAX_RATIO = 5 / 4;
+const cardRatio = (image: MediaAsset) => Math.min(MAX_RATIO, Math.max(MIN_RATIO, image.width / image.height));
+
 interface Props {
   /** The pictures of one work: its cover first, then its gallery. */
   images: MediaAsset[];
@@ -59,8 +64,11 @@ export function PortfolioCarousel({ images, title, labels }: Props) {
             aria-current={index === active ? "true" : undefined}
             aria-hidden={depth > 1}
             tabIndex={depth > 1 ? -1 : 0}
-            className={`group absolute left-1/2 top-1/2 h-[420px] w-[min(76vw,400px)] overflow-hidden rounded-[1.25rem] border border-white/20 bg-[#0d0f14] shadow-2xl shadow-black/30 outline-offset-4 transition-[transform,opacity,filter] duration-700 ease-out-expo sm:h-[540px] sm:w-[440px] lg:h-[min(60svh,580px)] ${index === active ? "cursor-zoom-in" : ""}`}
+            className={`group absolute left-1/2 top-1/2 h-[420px] max-w-[86vw] overflow-hidden rounded-[1.25rem] border border-white/20 bg-[#0d0f14] shadow-2xl shadow-black/30 outline-offset-4 transition-[transform,opacity,filter] duration-700 ease-out-expo sm:h-[540px] lg:h-[min(60svh,580px)] ${index === active ? "cursor-zoom-in" : ""}`}
             style={{
+              // Width follows the picture, so a 1080×1350 post fills its card with
+              // no empty bands; extreme shapes are held within a sensible range.
+              aspectRatio: `${cardRatio(image)}`,
               transform: `translate3d(calc(-50% + ${distance} * min(37vw, 275px)), -50%, ${-depth * 110}px) rotateY(${-distance * 11}deg) scale(${Math.max(0.64, 1 - depth * 0.13)})`,
               opacity: depth > 1 ? 0 : depth === 0 ? 1 : 0.46,
               filter: depth === 0 ? "none" : "blur(3px)",
@@ -69,7 +77,7 @@ export function PortfolioCarousel({ images, title, labels }: Props) {
             }}>
             {/* The whole picture is shown, never cropped: the client asked to see it in full. */}
             <div aria-hidden className="absolute inset-0 scale-110 bg-cover bg-center opacity-45 blur-2xl" style={{ backgroundImage: `url(${image.url})` }} />
-            <Picture asset={image} fill fit="contain" priority={index === active} sizes="(min-width: 640px) 440px, 76vw" alt={title} className="absolute inset-0" />
+            <Picture asset={image} fill fit="contain" priority={index === active} sizes="(min-width: 640px) 720px, 86vw" alt={title} className="absolute inset-0" />
             {index === active && (
               <span className="absolute bottom-3 right-3 grid size-10 place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
                 <Maximize2 className="size-4" />
