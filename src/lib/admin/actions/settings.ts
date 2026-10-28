@@ -5,7 +5,8 @@ import { requireAdmin } from "@/lib/auth/session";
 import { settingsSchema, type Localized, type SiteSettings } from "@/lib/settings/schema";
 import { getSettings, saveSettings } from "@/lib/settings/service";
 import { defaultTheme, themeSchema, type Theme } from "@/lib/theme/schema";
-import { type ActionResult, ok, run } from "../result";
+import { describeMailError, isMailConfigured, sendTestEmail } from "@/lib/notify";
+import { type ActionResult, ok, run, UserError } from "../result";
 import { revalidateSite } from "../revalidate";
 
 type GeneralSettings = Pick<SiteSettings, "brand" | "hero" | "projects" | "contact" | "seo">;
@@ -67,6 +68,26 @@ export async function saveGeneralSettings(
     await saveSettings({ ...(await getSettings()), ...general });
     revalidateSite();
     return ok(general);
+  });
+}
+
+/**
+ * Sends a test letter with the mailbox settings as typed — before saving, so
+ * a wrong password shows up here rather than as a silently lost message.
+ */
+export async function sendTestMail(contact: SiteSettings["contact"]): Promise<ActionResult<{ to: string }>> {
+  await requireAdmin();
+  return run(async () => {
+    const data = settingsSchema.shape.contact.parse(contact);
+    const to = data.email || data.smtpUser;
+    if (!to) throw new UserError("Avval xabarlar keladigan emailni kiriting");
+    if (!isMailConfigured(data)) throw new UserError("Yuboruvchi pochta manzili va ilova parolini kiriting");
+    try {
+      await sendTestEmail(data, (await getSettings()).brand.name, to);
+    } catch (error) {
+      throw new UserError(describeMailError(error));
+    }
+    return ok({ to });
   });
 }
 

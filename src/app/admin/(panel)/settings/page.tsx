@@ -10,6 +10,7 @@ export const metadata: Metadata = { title: "Sozlamalar" };
 
 export default async function SettingsPage() {
   const { brand, hero, projects, contact, seo, statement } = await getSettings();
+  // The panel's own mailbox fields take precedence; this only says whether there is a fallback.
   const smtpConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD);
   const media = await getMediaMap([hero.photoId, hero.backgroundId]);
 

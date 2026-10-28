@@ -6,7 +6,7 @@ import { useDirtyState, useSaveShortcut, useUnsavedGuard } from "@/components/ad
 import { LocalizedField } from "@/components/admin/LocalizedField";
 import { useToast } from "@/components/admin/Toaster";
 import { Button, Card, Field, Input, SaveBar, Switch } from "@/components/admin/ui";
-import { saveGeneralSettings } from "@/lib/admin/actions/settings";
+import { saveGeneralSettings, sendTestMail } from "@/lib/admin/actions/settings";
 import type { MediaAsset } from "@/lib/media/types";
 import type { SiteSettings } from "@/lib/settings/schema";
 import { HeroSettings } from "./HeroSettings";
@@ -15,10 +15,11 @@ type General = Pick<SiteSettings, "brand" | "hero" | "projects" | "contact" | "s
 
 interface Props {
   initial: General;
+  /** Whether SMTP_* environment variables provide a mailbox when the panel has none. */
+  smtpConfigured: boolean;
   /** Resolved from `hero.photoId` — settings store only the id. */
   heroPhoto: MediaAsset | null;
   heroBackground: MediaAsset | null;
-  smtpConfigured: boolean;
 }
 
 export function GeneralSettingsForm({ initial, heroPhoto, heroBackground, smtpConfigured }: Props) {
@@ -28,6 +29,8 @@ export function GeneralSettingsForm({ initial, heroPhoto, heroBackground, smtpCo
   const [photo, setPhoto] = useState(heroPhoto);
   const [backdrop, setBackdrop] = useState(heroBackground);
   const { value, setValue, dirty, markSaved } = useDirtyState(initial);
+  const [testing, startTest] = useTransition();
+  const mailReady = Boolean(value.contact.smtpUser && value.contact.smtpPassword) || smtpConfigured;
 
   const setGroup = <K extends keyof General>(key: K, patch: Partial<General[K]>) =>
     setValue((v) => ({ ...v, [key]: { ...v[key], ...patch } }));
@@ -80,15 +83,78 @@ export function GeneralSettingsForm({ initial, heroPhoto, heroBackground, smtpCo
           <Field
             label="Xabarlar keladigan email"
             hint={
-              smtpConfigured ? undefined : (
+              mailReady ? undefined : (
                 <span className="flex items-center gap-1.5 text-amber-400">
-                  <TriangleAlert className="size-3.5" /> SMTP sozlanmagan (.env) — xabarlar hozircha faqat admin panelga tushadi
+                  <TriangleAlert className="size-3.5" /> Yuboruvchi pochta kiritilmagan — xabarlar hozircha faqat admin panelga tushadi
                 </span>
               )
             }
           >
             <Input type="email" value={value.contact.email} onChange={(e) => setGroup("contact", { email: e.target.value })} placeholder="you@example.com" />
           </Field>
+          <div className="rounded-xl border border-border p-4">
+            <p className="text-sm font-semibold">Xat yuboruvchi pochta</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Sayt xabarlarni shu Gmail orqali jo&apos;natadi. Parol — Gmail&apos;ning oddiy paroli emas, 16 xonali ilova paroli:
+              Google hisobida 2 bosqichli tekshiruvni yoqing, so&apos;ng{" "}
+              <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" className="text-accent underline">
+                myaccount.google.com/apppasswords
+              </a>{" "}
+              sahifasida yangi parol yarating.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field label="Gmail manzili">
+                <Input
+                  type="email"
+                  value={value.contact.smtpUser}
+                  onChange={(e) => setGroup("contact", { smtpUser: e.target.value.trim() })}
+                  placeholder="sayt.xabarlar@gmail.com"
+                  autoComplete="off"
+                />
+              </Field>
+              <Field label="Ilova paroli (16 xonali)">
+                <Input
+                  type="password"
+                  value={value.contact.smtpPassword}
+                  onChange={(e) => setGroup("contact", { smtpPassword: e.target.value.replace(/\s+/g, "") })}
+                  placeholder="abcdefghijklmnop"
+                  className="font-mono text-sm"
+                  autoComplete="new-password"
+                />
+              </Field>
+            </div>
+            <details className="mt-4">
+              <summary className="cursor-pointer text-xs font-semibold text-muted">Gmail emas, boshqa pochta</summary>
+              <div className="mt-3 grid gap-4 sm:grid-cols-[1fr_8rem]">
+                <Field label="SMTP server">
+                  <Input value={value.contact.smtpHost} onChange={(e) => setGroup("contact", { smtpHost: e.target.value.trim() })} placeholder="smtp.gmail.com" />
+                </Field>
+                <Field label="Port">
+                  <Input
+                    type="number"
+                    value={value.contact.smtpPort}
+                    onChange={(e) => setGroup("contact", { smtpPort: Number(e.target.value) || 465 })}
+                    placeholder="465"
+                  />
+                </Field>
+              </div>
+            </details>
+            <Button
+              type="button"
+              size="sm"
+              className="mt-4"
+              loading={testing}
+              disabled={!mailReady}
+              onClick={() =>
+                startTest(async () => {
+                  const result = await sendTestMail(value.contact);
+                  toast.result(result, "Sinov xati yuborildi — pochtangizni tekshiring");
+                })
+              }
+            >
+              Sinov xati yuborish
+            </Button>
+          </div>
           <LocalizedField label="Sarlavha" value={value.contact.title} onChange={(title) => setGroup("contact", { title })} />
           <LocalizedField label="Matn" value={value.contact.subtitle} onChange={(subtitle) => setGroup("contact", { subtitle })} multiline />
           <details className="rounded-xl border border-border p-4">

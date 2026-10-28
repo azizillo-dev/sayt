@@ -157,6 +157,14 @@ export const settingsSchema = z.object({
       ),
       telegramBotToken: z.string().max(200).default(""),
       telegramChatId: z.string().max(100).default(""),
+      /**
+       * The mailbox the site sends from — for Gmail an app password, not the
+       * account's own. Set here, it overrides the SMTP_* environment variables.
+       */
+      smtpUser: z.union([z.email(), z.literal("")]).default(""),
+      smtpPassword: z.string().max(200).default(""),
+      smtpHost: z.string().max(200).default("smtp.gmail.com"),
+      smtpPort: z.coerce.number().int().min(1).max(65535).default(465),
     })
     .prefault({}),
 
