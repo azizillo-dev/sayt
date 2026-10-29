@@ -12,6 +12,7 @@ import { buildNavigation, resolveLocale } from "@/lib/content/navigation";
 import { getSocialLinks } from "@/lib/content/queries";
 import { localeTags, locales } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { siteSeo } from "@/lib/settings/seo";
 import { getSettings } from "@/lib/settings/service";
 import { themeToCss } from "@/lib/theme/css";
 import "../../globals.css";
@@ -29,13 +30,16 @@ export async function generateMetadata({ params }: Omit<Props, "children">): Pro
   const locale = await resolveLocale(params);
   const settings = await getSettings();
   const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const seo = siteSeo(settings, locale);
   return {
     metadataBase: new URL(siteUrl),
-    title: { default: settings.brand.name, template: `%s — ${settings.brand.name}` },
-    description: settings.seo.description[locale] || settings.hero.subtitle[locale],
-    openGraph: { siteName: settings.brand.name, locale: localeTags[locale], type: "website" },
+    // Inner pages read "Hamkorlar — Rustam Turg'unboyev": the name is what people search for.
+    title: { default: seo.title, template: `%s — ${seo.name}` },
+    description: seo.description,
+    applicationName: settings.brand.name,
+    openGraph: { siteName: settings.brand.name, locale: localeTags[locale], type: "website", title: seo.title, description: seo.description },
     alternates: {
-      languages: Object.fromEntries(locales.map((l) => [localeTags[l], `/${l}`])),
+      languages: { ...Object.fromEntries(locales.map((l) => [localeTags[l], `/${l}`])), "x-default": `/${locales[0]}` },
     },
   };
 }

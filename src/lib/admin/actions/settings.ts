@@ -38,6 +38,7 @@ export async function saveGeneralSettings(
       heroTagline: data.hero.tagline,
       contactTitle: data.contact.title,
       contactSubtitle: data.contact.subtitle,
+      seoTitle: data.seo.title,
       seoDescription: data.seo.description,
     };
     data.hero.columns.forEach((column, i) => {
@@ -62,7 +63,7 @@ export async function saveGeneralSettings(
         columns: data.hero.columns.map((_, i) => ({ title: t(`col${i}.title`), items: t(`col${i}.items`) })),
       },
       contact: { ...data.contact, title: t("contactTitle"), subtitle: t("contactSubtitle") },
-      seo: { description: t("seoDescription") },
+      seo: { title: t("seoTitle"), description: t("seoDescription") },
     };
 
     await saveSettings({ ...(await getSettings()), ...general });

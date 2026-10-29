@@ -170,6 +170,8 @@ export const settingsSchema = z.object({
 
   seo: z
     .object({
+      /** The home page's title in search results; empty uses the dictionary's "name — graphic designer…". */
+      title: localized(),
       description: localized(),
     })
     .prefault({}),

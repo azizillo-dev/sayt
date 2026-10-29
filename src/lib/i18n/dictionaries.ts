@@ -84,6 +84,13 @@ const uz = {
   empty: {
     projects: "Hozircha loyihalar yo'q.",
   },
+  /** Used for search results when the admin leaves the SEO fields empty; {name} is the designer. */
+  seo: {
+    title: "{name} — grafik dizayner: logo, brending, SMM dizayn",
+    description:
+      "{name} — grafik dizayner. Logotip va brending, ijtimoiy tarmoqlar uchun dizayn, reklama va vizual dizayn. Portfolio, hamkorlar va buyurtma uchun bog'lanish.",
+    jobTitle: "Grafik dizayner",
+  },
 };
 
 export type Dictionary = typeof uz;
@@ -172,6 +179,12 @@ const ru: Dictionary = {
   empty: {
     projects: "Проектов пока нет.",
   },
+  seo: {
+    title: "{name} — графический дизайнер: логотипы, брендинг, SMM-дизайн",
+    description:
+      "{name} — графический дизайнер. Логотипы и брендинг, дизайн для соцсетей, рекламный и визуальный дизайн. Портфолио, партнёры и контакты для заказа.",
+    jobTitle: "Графический дизайнер",
+  },
 };
 
 const en: Dictionary = {
@@ -257,6 +270,12 @@ const en: Dictionary = {
   },
   empty: {
     projects: "No projects yet.",
+  },
+  seo: {
+    title: "{name} — graphic designer: logo, branding, social media design",
+    description:
+      "{name} — graphic designer. Logos and branding, social media design, advertising and visual design. Portfolio, partners and contact for commissions.",
+    jobTitle: "Graphic designer",
   },
 };
 

@@ -185,8 +185,14 @@ export function GeneralSettingsForm({ initial, heroPhoto, heroBackground, smtpCo
         </div>
       </Card>
 
-      <Card title="SEO" description="Google va ijtimoiy tarmoqlarda havola ostida chiqadigan tavsif">
-        <LocalizedField label="Sayt tavsifi" value={value.seo.description} onChange={(description) => setGroup("seo", { description })} multiline />
+      <Card
+        title="SEO — Google qidiruvi"
+        description="Google'da “dizayner”, “logo dizayn” deb qidirganlarga sayt shu sarlavha va tavsif bilan chiqadi. Bo'sh qolsa, ism va “grafik dizayner — logo, brending, SMM dizayn” matni ishlatiladi."
+      >
+        <div className="space-y-4">
+          <LocalizedField label="Google'dagi sarlavha (60 belgigacha)" value={value.seo.title} onChange={(title) => setGroup("seo", { title })} />
+          <LocalizedField label="Sayt tavsifi (160 belgigacha)" value={value.seo.description} onChange={(description) => setGroup("seo", { description })} multiline />
+        </div>
       </Card>
 
       <SaveBar
